@@ -3,8 +3,8 @@ import { useState } from "react";
 
 import { useRouter } from 'expo-router';
 import { useAccountStore } from '../../stores/useAccountStore';
-import { useLoginStore } from '../stores/useLoginStore';
-import colors from '../colors';
+import { useLoginStore } from '../../stores/useLoginStore';
+import colors from '../../colors';
 
 export default function CreateAccount() {
     const { addAccount } = useAccountStore();
