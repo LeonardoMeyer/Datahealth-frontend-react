@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text, TextInput, Alert } from 'react-native';
 import { useState } from "react";
-import Button from '../Views/components/Button';
+import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
 
 export default function SignUp() {
@@ -34,7 +34,6 @@ export default function SignUp() {
 
         if (response.ok) {
             Alert.alert('Usuário Criado com Sucesso!');
-            // Limpa os campos do formulário após o sucesso no cadastro
             setTxtName('');
             setTxtEmail('');
             setTxtPass('');

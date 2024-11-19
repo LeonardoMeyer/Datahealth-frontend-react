@@ -1,6 +1,6 @@
 import {View, StyleSheet, Text, TextInput} from 'react-native'
 import { Image } from 'expo-image'
-import Button from '../Views/components/Button';
+import Button from '../Views/components/Button.js';
 import { useLocalSearchParams, useRouter} from 'expo-router'
 import { useAccountStore } from '../stores/useAccountStore'
 import * as Clipboard from 'expo-clipboard'

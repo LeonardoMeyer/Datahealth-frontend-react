@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View, Text, TextInput, Alert } from 'react-native';
-import Button from '../Views/components/Button';
+import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useLoginStore } from '../stores/useLoginStore';

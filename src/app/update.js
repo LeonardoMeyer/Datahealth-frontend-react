@@ -1,6 +1,6 @@
 import {View, StyleSheet, Text, TextInput} from 'react-native'
 import { useState } from "react"
-import Button from '../Views/components/Button';
+import Button from '../Views/components/Button.js';
 
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { useAccountStore } from '../stores/useAccountStore'

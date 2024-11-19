@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text, TextInput, Alert } from 'react-native';
 import { useState } from "react";
-import Button from '../Views/components/Button'; // Certifique-se de que o caminho para Button esteja correto
+import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
 import { useAccountStore } from '../stores/useAccountStore'; // Caminho atualizado para dois níveis acima
 import { useLoginStore } from '../stores/useLoginStore';
