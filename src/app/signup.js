@@ -6,45 +6,40 @@ import { useRouter } from 'expo-router';
 export default function SignUp() {
   const router = useRouter();
 
-  const [txtName, setTxtName] = useState('');
-  const [txtEmail, setTxtEmail] = useState('');
-  const [txtPass, setTxtPass] = useState('');
-  const [txtAvatar, setTxtAvatar] = useState('');
-  const [txtAge, setTxtAge] = useState('');
-  const [txtEthnicity, setTxtEthnicity] = useState('');
-  const [txtPhone, setTxtPhone] = useState('');
-  const [txtAddress, setTxtAddress] = useState('');
-  const [txtGender, setTxtGender] = useState('');
-  const [txtBloodType, setTxtBloodType] = useState('');
-  const [txtHeight, setTxtHeight] = useState('');
-  const [txtWeight, setTxtWeight] = useState('');
-  const [txtChronicConditions, setTxtChronicConditions] = useState('');
-  const [txtAllergies, setTxtAllergies] = useState('');
-  const [txtEmergencyContact, setTxtEmergencyContact] = useState('');
-  const [txtInsuranceProvider, setTxtInsuranceProvider] = useState('');
-  const [txtInsuranceNumber, setTxtInsuranceNumber] = useState('');
-  const [txtSmoker, setTxtSmoker] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    pass: '',
+    avatar: '',
+    age: '',
+    ethnicity: '',
+    gender: '',
+    bloodType: '',
+    phone: '',
+    address: '',
+    height: '',
+    weight: '',
+    chronicConditions: '',
+    allergies: '',
+    emergencyContact: '',
+    insuranceProvider: '',
+    insuranceNumber: '',
+    smoker: false,
+  });
+
+  const handleInputChange = (key, value) => {
+    setFormData(prevState => ({
+      ...prevState,
+      [key]: value,
+    }));
+  };
 
   const handleCreateAccount = async () => {
     const user = {
-      name: txtName,
-      email: txtEmail,
-      pass: txtPass,
-      avatar: txtAvatar,
-      age: parseInt(txtAge), // Convertendo idade para número
-      ethnicity: txtEthnicity,
-      phone: txtPhone,
-      address: txtAddress,
-      gender: txtGender,
-      blood_type: txtBloodType,
-      height: parseFloat(txtHeight),
-      weight: parseFloat(txtWeight),
-      chronic_conditions: txtChronicConditions,
-      allergies: txtAllergies,
-      emergency_contact: txtEmergencyContact,
-      insurance_provider: txtInsuranceProvider,
-      insurance_number: txtInsuranceNumber,
-      smoker: txtSmoker,
+      ...formData,
+      age: parseInt(formData.age),
+      height: parseFloat(formData.height),
+      weight: parseFloat(formData.weight),
     };
 
     try {
@@ -71,156 +66,36 @@ export default function SignUp() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.label}>Nome:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtName}
-        value={txtName}
-        placeholder='Digite seu nome...'
-        placeholderTextColor='#DDDDDD'
-      />
-      
-      <Text style={styles.label}>Email:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtEmail}
-        value={txtEmail}
-        placeholder='Digite seu email...'
-        placeholderTextColor='#DDDDDD'
-        keyboardType="email-address"
-      />
-      
-      <Text style={styles.label}>Telefone:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtPhone}
-        value={txtPhone}
-        placeholder='Digite seu telefone...'
-        placeholderTextColor='#DDDDDD'
-        keyboardType="phone-pad"
-      />
-      
-      <Text style={styles.label}>Endereço:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtAddress}
-        value={txtAddress}
-        placeholder='Digite seu endereço...'
-        placeholderTextColor='#DDDDDD'
-      />
-      
-      <Text style={styles.label}>Idade:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtAge}
-        value={txtAge}
-        placeholder='Digite sua idade...'
-        placeholderTextColor='#DDDDDD'
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Gênero:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtGender}
-        value={txtGender}
-        placeholder='Digite seu gênero...'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>Tipo Sanguíneo:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtBloodType}
-        value={txtBloodType}
-        placeholder='Digite seu tipo sanguíneo...'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>Altura (m):</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtHeight}
-        value={txtHeight}
-        placeholder='Digite sua altura (ex: 1.75)...'
-        placeholderTextColor='#DDDDDD'
-        keyboardType="decimal-pad"
-      />
-
-      <Text style={styles.label}>Peso (kg):</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtWeight}
-        value={txtWeight}
-        placeholder='Digite seu peso (ex: 70.5)...'
-        placeholderTextColor='#DDDDDD'
-        keyboardType="decimal-pad"
-      />
-
-      <Text style={styles.label}>Condições Crônicas:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtChronicConditions}
-        value={txtChronicConditions}
-        placeholder='Digite suas condições crônicas...'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>Alergias:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtAllergies}
-        value={txtAllergies}
-        placeholder='Digite suas alergias...'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>Contato de Emergência:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtEmergencyContact}
-        value={txtEmergencyContact}
-        placeholder='Digite o telefone de emergência...'
-        placeholderTextColor='#DDDDDD'
-        keyboardType="phone-pad"
-      />
-
-      <Text style={styles.label}>Convênio:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtInsuranceProvider}
-        value={txtInsuranceProvider}
-        placeholder='Digite o nome do convênio...'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>Número do Convênio:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtInsuranceNumber}
-        value={txtInsuranceNumber}
-        placeholder='Digite o número do convênio...'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>É fumante? (true/false):</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={(value) => setTxtSmoker(value.toLowerCase() === 'true')}
-        value={txtSmoker.toString()}
-        placeholder='Digite true ou false'
-        placeholderTextColor='#DDDDDD'
-      />
-
-      <Text style={styles.label}>Senha:</Text>
-      <TextInput 
-        style={styles.input}
-        onChangeText={setTxtPass}
-        value={txtPass}
-        placeholder='Digite sua senha...'
-        placeholderTextColor='#DDDDDD'
-        secureTextEntry={true}
-      />
+      {[
+        { label: 'Nome', key: 'name', placeholder: 'Digite seu nome...' },
+        { label: 'Email', key: 'email', placeholder: 'Digite seu email...', keyboardType: 'email-address' },
+        { label: 'Telefone', key: 'phone', placeholder: 'Digite seu telefone...', keyboardType: 'phone-pad' },
+        { label: 'Endereço', key: 'address', placeholder: 'Digite seu endereço...' },
+        { label: 'Idade', key: 'age', placeholder: 'Digite sua idade...', keyboardType: 'numeric' },
+        { label: 'Gênero', key: 'gender', placeholder: 'Digite seu gênero...' },
+        { label: 'Tipo Sanguíneo', key: 'bloodType', placeholder: 'Digite seu tipo sanguíneo...' },
+        { label: 'Altura (m)', key: 'height', placeholder: 'Digite sua altura (ex: 1.75)...', keyboardType: 'decimal-pad' },
+        { label: 'Peso (kg)', key: 'weight', placeholder: 'Digite seu peso (ex: 70.5)...', keyboardType: 'decimal-pad' },
+        { label: 'Condições Crônicas', key: 'chronicConditions', placeholder: 'Digite suas condições crônicas...' },
+        { label: 'Alergias', key: 'allergies', placeholder: 'Digite suas alergias...' },
+        { label: 'Contato de Emergência', key: 'emergencyContact', placeholder: 'Digite o telefone de emergência...', keyboardType: 'phone-pad' },
+        { label: 'Convênio', key: 'insuranceProvider', placeholder: 'Digite o nome do convênio...' },
+        { label: 'Número do Convênio', key: 'insuranceNumber', placeholder: 'Digite o número do convênio...' },
+        { label: 'É fumante? (true/false)', key: 'smoker', placeholder: 'Digite true ou false' },
+        { label: 'Senha', key: 'pass', placeholder: 'Digite sua senha...', secureTextEntry: true },
+      ].map(({ label, key, placeholder, ...inputProps }) => (
+        <View key={key}>
+          <Text style={styles.label}>{label}:</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={(value) => handleInputChange(key, key === 'smoker' ? value.toLowerCase() === 'true' : value)}
+            value={formData[key].toString()}
+            placeholder={placeholder}
+            placeholderTextColor="#DDDDDD"
+            {...inputProps}
+          />
+        </View>
+      ))}
 
       <Button onPress={handleCreateAccount} title="Cadastrar" />
     </ScrollView>
