@@ -1,23 +1,57 @@
-import { ScrollView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import { useEffect } from 'react';
-import Footer from '../Views/components/Footer';
-import { useRouter } from 'expo-router';
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
 
-export default function Init() {
+export default function Home() {
   const router = useRouter();
-
-  useEffect(() => {
-    // Redireciona para a tela de login após 3 segundos
-    setTimeout(() => router.replace('/login'), 3000);
-  }, []);
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Datahealth</Text>
-        <Text style={styles.subtitle}>Gerencie informações de pacientes e hospital com o Datahealth.</Text>
-        <ActivityIndicator size="large" color="#007AFF" style={{ marginVertical: 30 }} />
-        <Footer />
+      {/* Cabeçalho */}
+      <View style={styles.header}>
+        <Text style={styles.headerText}>DataHealth</Text>
+        <Text style={styles.subHeaderText}>Sistema Hospitalar</Text>
+      </View>
+
+      {/* Área Principal */}
+      <View style={styles.main}>
+        <Text style={styles.welcomeText}>Bem-vindo, escolha uma opção abaixo:</Text>
+
+        {/* Botões de Navegação */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push("/add-patient")}
+          >
+            <Text style={styles.buttonText}>Adicionar Paciente</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push("/appointments")}
+          >
+            <Text style={styles.buttonText}>Ver Agenda</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push("/doctors")}
+          >
+            <Text style={styles.buttonText}>Lista de Médicos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push("/settings")}
+          >
+            <Text style={styles.buttonText}>Configurações</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Rodapé */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>© 2024 DataHealth. Todos os direitos reservados.</Text>
       </View>
     </ScrollView>
   );
@@ -26,23 +60,57 @@ export default function Init() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#F5F5F7",
   },
-  content: {
-    flex: 1,
-    marginTop: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
+  header: {
+    backgroundColor: "#007AFF",
+    padding: 20,
+    alignItems: "center",
   },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#007AFF', // Cor azul no estilo Apple
+  headerText: {
+    color: "#FFFFFF",
+    fontSize: 28,
+    fontWeight: "bold",
   },
-  subtitle: {
+  subHeaderText: {
+    color: "#E1E1E6",
     fontSize: 16,
-    marginVertical: 10,
-    textAlign: 'center',
-    color: '#333', // Cor cinza para o texto descritivo
+    marginTop: 5,
+  },
+  main: {
+    flex: 1,
+    padding: 20,
+    alignItems: "center",
+  },
+  welcomeText: {
+    fontSize: 18,
+    color: "#1C1C1E",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  buttonContainer: {
+    width: "100%",
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 15,
     paddingHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  footer: {
+    backgroundColor: "#E1E1E6",
+    padding: 10,
+    alignItems: "center",
+  },
+  footerText: {
+    color: "#1C1C1E",
+    fontSize: 14,
   },
 });
