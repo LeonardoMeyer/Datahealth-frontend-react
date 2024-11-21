@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet } from 'react-native'
 import Header from '../Views/components/Header';
 import Footer from '../Views/components/Footer'
-import Content from '../Views/components/Content'
+import Content from '../Views/components/record'
 
 
 export default function Home() {

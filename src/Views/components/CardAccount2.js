@@ -1,15 +1,21 @@
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
-export default function CardAccount2({ service, userName, imgUrl }) {
+export default function CardAccount2({ record }) {
     return (
         <View style={styles.card}>
-            <Image style={styles.logo} source={imgUrl} />
+            {/* Exibindo a imagem do exame */}
+            <Image style={styles.logo} source={{ uri: record.exam }} />
+
             <View style={styles.infoContainer}>
-                <Text style={styles.service}>{service}</Text>
-                <Text style={styles.username}>{userName}</Text>
+                <Text style={styles.service}>Relatório: {record.report}</Text>
+                <Text style={styles.username}>Receita: {record.recipe}</Text>
+                <Text style={styles.date}>Data: {new Date(record.date).toLocaleDateString()}</Text>
             </View>
+
+            {/* Ícone de seta */}
             <EvilIcons name="arrow-right" size={26} color="#CCCCCC" />
         </View>
     );
@@ -47,5 +53,10 @@ const styles = StyleSheet.create({
     username: {
         color: '#777777',
         fontSize: 14,
+    },
+    date: {
+        fontSize: 12,
+        color: '#555555',
+        marginTop: 4,
     },
 });

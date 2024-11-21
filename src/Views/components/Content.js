@@ -8,7 +8,7 @@ export default function Content() {
 
   useEffect(() => {
     const getAccounts = async () => {
-      const response = await fetch('http://localhost:3000/account/list');
+      const response = await fetch('http://localhost:3000/record/list');
       if (response.ok) {
         const data = await response.json();
         setAccounts(data.accounts);
