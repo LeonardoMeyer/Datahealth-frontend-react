@@ -69,7 +69,7 @@ export default function SignUp() {
             onChangeText={(value) => handleInputChange(key, value)}
             value={formData[key]?.toString()}
             placeholder={placeholder}
-            placeholderTextColor="#DDDDDD"
+            placeholderTextColor="#BCCBD4"
             {...inputProps}
           />
         </View>
@@ -118,30 +118,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: '#8CABCD',
   },
   label: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#333',
+    color: '#466684',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#444444',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginVertical: 8,
-    borderRadius: 5,
-    backgroundColor: '#F9F9F9',
-    color: '#333333',
+    borderColor: '#587796',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#F5F7FA',
+    color: '#466684',
   },
   picker: {
     borderWidth: 1,
-    borderColor: '#444444',
-    borderRadius: 5,
-    marginVertical: 8,
+    borderColor: '#587796',
+    borderRadius: 10,
+    marginVertical: 10,
     padding: 10,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#F5F7FA',
+    color: '#466684',
+  },
+  button: {
+    backgroundColor: '#7B9ABB',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
