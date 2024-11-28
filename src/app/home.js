@@ -1,17 +1,17 @@
-import { ScrollView, StyleSheet } from 'react-native'
-import Header from '../Views/components/Header';
-import Footer from '../Views/components/Footer'
-import Content from '../Views/components/record'
-
+import React from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
+import Header from '../views/components/Header';
+import Footer from '../views/components/Footer';
+import Content from '../views/components/record';
 
 export default function Home() {
   return (
-      <ScrollView style={styles.container}>
-        <Header />
-        <Content />
-        <Footer />
-      </ScrollView>
-  )
+    <ScrollView style={styles.container}>
+      <Header />
+      <Content />
+      <Footer />
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
