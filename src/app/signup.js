@@ -12,7 +12,7 @@ export default function SignUp() {
     pass: '',
     avatar: '',
     age: '',
-    ethnicity: '',
+    ethnicity: '',  // Adicionando o campo de etnia
     gender: '',
     blood_type: '',
   });
@@ -55,7 +55,7 @@ export default function SignUp() {
   return (
     <ScrollView style={styles.container}>
       {/* Campos de Cadastro */}
-      {[
+      {[ 
         { label: 'Nome', key: 'name', placeholder: 'Digite seu nome...' },
         { label: 'Email', key: 'email', placeholder: 'Digite seu email...', keyboardType: 'email-address' },
         { label: 'Idade', key: 'age', placeholder: 'Digite sua idade...', keyboardType: 'numeric' },
@@ -106,6 +106,22 @@ export default function SignUp() {
         <Picker.Item label="AB-" value="AB-" />
         <Picker.Item label="O+" value="O+" />
         <Picker.Item label="O-" value="O-" />
+      </Picker>
+
+      {/* Etnia */}
+      <Text style={styles.label}>Etnia:</Text>
+      <Picker
+        selectedValue={formData.ethnicity}
+        onValueChange={(value) => handleInputChange('ethnicity', value)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Selecione" value="" />
+        <Picker.Item label="Caucasiano" value="caucasiano" />
+        <Picker.Item label="Negro" value="negro" />
+        <Picker.Item label="Indígena" value="indigena" />
+        <Picker.Item label="Asiático" value="asiatico" />
+        <Picker.Item label="Pardo" value="pardo" />
+        <Picker.Item label="Outro" value="outro" />
       </Picker>
 
       {/* Botão de Cadastro */}
