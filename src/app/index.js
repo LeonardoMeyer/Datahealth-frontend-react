@@ -11,7 +11,7 @@ export default function Index() {
    
         const user = await getObjectData('userLogged');
         if (user && user.accessToken) {
-          router.replace('/home'); 
+          router.replace('/login'); 
         } else {
           router.replace('/login'); 
         }
