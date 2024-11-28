@@ -1,3 +1,4 @@
+
 import { ScrollView, StyleSheet } from 'react-native'
 import Header from '../Views/components/Header';
 import Footer from '../Views/components/Footer'
@@ -18,8 +19,8 @@ export default function Home() {
         <Footer />
       </ScrollView>
   )
-}
 
+  }
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Header from './views/components/Header';
 import Footer from './views/components/Footer';
-import colors from './src/colors';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
+import colors from './src/colors';
 
 export default function App() {
   return (
