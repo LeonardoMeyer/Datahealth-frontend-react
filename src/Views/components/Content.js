@@ -32,7 +32,9 @@ export default function Content() {
         />
       ))}
     </View>
+    
   );
+  
 }
 
 const styles = StyleSheet.create({

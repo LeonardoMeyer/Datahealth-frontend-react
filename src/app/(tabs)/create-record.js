@@ -2,11 +2,12 @@ import { View, StyleSheet, Text, TextInput } from 'react-native';
 import { useState } from 'react';
 import Button from '../../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useRecordStore } from '../../stores/useRecordStore'; // Mudança para usar o store de record
+import { useRecordStore } from '../../stores/useRecordStore'; 
 import { fetchAuth } from '../../utils/fetchAuth';
 
 export default function CreateRecord() {
-  const { addRecord } = useRecordStore(); // Função para adicionar um novo record
+console.log(fetchAuth.accessToken)
+  const { addRecord } = useRecordStore(); 
   const router = useRouter();
 
   const [txtReport, setTxtReport] = useState('');
@@ -17,28 +18,26 @@ export default function CreateRecord() {
   const handleCreateRecord = async () => {
     const record = {
       report: txtReport,
-      exam: txtExam, // Pode ser uma URL de imagem ou um caminho para o arquivo
+      exam: txtExam, 
       recipe: txtRecipe,
-      date: txtDate, // Certifique-se de enviar a data no formato correto
+      date: txtDate, 
     };
 
     const response = await fetchAuth('http://localhost:3000/record', {
       method: 'POST',
-      body: JSON.stringify(record),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      body: JSON.stringify(record)
     });
 
     if (response.ok) {
       const data = await response.json();
-      addRecord(data.record); // Atualizando o store com o novo record
-      router.replace('/home'); // Redireciona para a tela inicial
+      addRecord(data.record); 
+      router.replace('/home'); 
       return;
     }
 
-    console.log('Erro ao criar o registro');
-  };
+    console.log('Erro ao criar o registro')
+    return
+  }
 
   return (
     <View style={styles.container}>
