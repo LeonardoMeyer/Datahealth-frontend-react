@@ -3,26 +3,37 @@ import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' , headerShown: false}}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: 'blue',
+        headerShown: false, // Remove o cabeçalho padrão, caso esteja presente
+        tabBarStyle: { backgroundColor: '#7B9ABB' },
+      }}
+    >
+      {/* Aba Home */}
       <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome name="home" size={24} color={color} />,
         }}
       />
+
+      {/* Aba Medicamentos */}
       <Tabs.Screen
-        name="create-account"
+        name="medication"
         options={{
-          title: 'Cadastrar',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="plus" color={color} />,
+          title: 'Medicamentos',
+          tabBarIcon: ({ color }) => <FontAwesome name="pills" size={24} color={color} />,
         }}
       />
+
+      {/* Aba Perfil */}
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome name="user" size={24} color={color} />,
         }}
       />
     </Tabs>

@@ -1,0 +1,63 @@
+[
+    {
+      "id": 1,
+      "nome": "Paracetamol",
+      "fabricante": "Fabricante A",
+      "substancia": "Paracetamol"
+    },
+    {
+      "id": 2,
+      "nome": "Ibuprofeno",
+      "fabricante": "Fabricante B",
+      "substancia": "Ibuprofeno"
+    },
+    {
+      "id": 3,
+      "nome": "Amoxicilina",
+      "fabricante": "Fabricante C",
+      "substancia": "Amoxicilina"
+    },
+    {
+      "id": 4,
+      "nome": "Dipirona",
+      "fabricante": "Fabricante D",
+      "substancia": "Dipirona Sódica"
+    },
+    {
+      "id": 5,
+      "nome": "Cloridrato de Metformina",
+      "fabricante": "Fabricante E",
+      "substancia": "Metformina"
+    },
+    {
+      "id": 6,
+      "nome": "Omeprazol",
+      "fabricante": "Fabricante F",
+      "substancia": "Omeprazol"
+    },
+    {
+      "id": 7,
+      "nome": "Atorvastatina",
+      "fabricante": "Fabricante G",
+      "substancia": "Atorvastatina"
+    },
+    {
+      "id": 8,
+      "nome": "Losartana Potássica",
+      "fabricante": "Fabricante H",
+      "substancia": "Losartana"
+    },
+    {
+      "id": 9,
+      "nome": "Hidroclorotiazida",
+      "fabricante": "Fabricante I",
+      "substancia": "Hidroclorotiazida"
+    },
+    {
+      "id": 10,
+      "nome": "Captopril",
+      "fabricante": "Fabricante J",
+      "substancia": "Captopril"
+    }
+  ]
+  
