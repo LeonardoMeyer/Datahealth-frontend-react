@@ -1,7 +1,6 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Header from '../Views/components/Header.js';
 import Footer from '../Views/components/Footer.js';
-import Content from '../Views/components/record.js';
 import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
 const router = useRouter();
@@ -10,7 +9,6 @@ export default function Home() {
   return (
     <ScrollView style={styles.container}>
       <Header />
-      <Content />
       <View style={styles.buttonContainer}>
         <Button onPress={() => router.push('/create-record')} style={styles.button}>
           Novo Registro
