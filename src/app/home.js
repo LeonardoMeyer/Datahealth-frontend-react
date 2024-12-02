@@ -1,30 +1,55 @@
-
-import { ScrollView, StyleSheet } from 'react-native'
-import Header from '../Views/components/Header';
-import Footer from '../Views/components/Footer'
-import Content from '../Views/components/record'
+import { ScrollView, StyleSheet, View } from 'react-native';
+import Header from '../Views/components/Header.js';
+import Footer from '../Views/components/Footer.js';
+import Content from '../Views/components/record.js';
 import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
 const router = useRouter();
 
-
 export default function Home() {
   return (
-      <ScrollView style={styles.container}>
-        <Header />
-        <Content />
-        <Button onPress={() => router.push('/create-record')} style={styles.signupButton}>
-          Novo
+    <ScrollView style={styles.container}>
+      <Header />
+      <Content />
+      <View style={styles.buttonContainer}>
+        <Button onPress={() => router.push('/create-record')} style={styles.button}>
+          Novo Registro
         </Button>
-        <Footer />
-      </ScrollView>
-  )
+        <Button onPress={() => router.push('/medication')} style={styles.button}>
+          Medicação
+        </Button>
+        <Button onPress={() => router.push('/prescriptions')} style={styles.button}>
+          Receitas
+        </Button>
+        <Button onPress={() => router.push('/doctors')} style={styles.button}>
+          Médicos
+        </Button>
+      </View>
+      <Footer />
+    </ScrollView>
+  );
+}
 
-  }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F7", 
+    backgroundColor: "#F5F5F7",
+  },
+  buttonContainer: {
+    marginVertical: 20,
+    alignItems: 'center',
+  },
+  button: {
+    marginVertical: 10,
+    backgroundColor: "#7B9ABB",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    alignItems: "center",
   },
   header: {
     backgroundColor: "#7B9ABB",
