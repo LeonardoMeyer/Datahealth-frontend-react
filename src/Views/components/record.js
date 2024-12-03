@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { fetchAuth } from '../../utils/fetchAuth';
-import CardAccount2 from '../components/CardAccount2'; // Importe o componente CardAccount2
+import CardAccount2 from '../components/CardAccount2';
 
 const RecordsScreen = () => {
   const [records, setRecords] = useState([]);
@@ -9,7 +9,7 @@ const RecordsScreen = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Função para buscar os registros
+
     const fetchRecords = async () => {
       try {
         const response = await fetchAuth('http://localhost:3000/record/list');
@@ -17,7 +17,7 @@ const RecordsScreen = () => {
           throw new Error('Erro ao buscar registros');
         }
         const data = await response.json();
-        setRecords(data.records); // Acessando a propriedade 'records'
+        setRecords(data.records); 
       } catch (err) {
         setError(err.message);
       } finally {
@@ -41,9 +41,9 @@ const RecordsScreen = () => {
       <Text>Lista de Prontuarios:</Text>
       <FlatList
         data={records}
-        keyExtractor={(item) => item.id.toString()} // Usando o 'id' como chave
+        keyExtractor={(item) => item.id.toString()} 
         renderItem={({ item }) => (
-          <CardAccount2 record={item} /> // Passando o 'item' (record) para o CardAccount2
+          <CardAccount2 record={item} />
         )}
       />
     </View>

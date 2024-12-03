@@ -1,3 +1,5 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 
@@ -6,7 +8,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: 'blue',
-        headerShown: false, // Remove o cabeçalho padrão, caso esteja presente
+        headerShown: false,
         tabBarStyle: { backgroundColor: '#7B9ABB' },
       }}
     >

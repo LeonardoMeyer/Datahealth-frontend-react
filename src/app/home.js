@@ -11,10 +11,6 @@ export default function Home() {
     <ScrollView style={styles.container}>
       <Header />
       <View style={styles.content}>
-        <Text style={styles.welcomeText}>DataHealth</Text>
-        <Text style={styles.description}>
-          Use os botões abaixo para acessar diferentes funcionalidades do sistema.
-        </Text>
         <View style={styles.buttonContainer}>
           <Button onPress={() => router.push('/create-record')} style={styles.button}>
             Novo Registro
@@ -44,19 +40,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#7B9ABB',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: 16,
-    color: '#666666',
-    textAlign: 'center',
-    marginBottom: 20,
   },
   buttonContainer: {
     marginTop: 20,

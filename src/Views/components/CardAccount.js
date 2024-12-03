@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',  // fundo cinza claro
+        backgroundColor: '#F5F5F5',
         padding: 15,
         borderRadius: 15,
         shadowColor: '#000',
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     logo: {
         width: 50,
         height: 50,
-        borderRadius: 10,  // cantos arredondados para a imagem
+        borderRadius: 10,
     },
     infoContainer: {
         flex: 1,

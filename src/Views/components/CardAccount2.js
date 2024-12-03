@@ -6,7 +6,7 @@ import EvilIcons from '@expo/vector-icons/EvilIcons';
 export default function CardAccount2({ record }) {
     return (
         <View style={styles.card}>
-            {/* Exibindo a imagem do exame */}
+
             <Image style={styles.logo} source={{ uri: record.exam }} />
 
             <View style={styles.infoContainer}>
@@ -15,7 +15,6 @@ export default function CardAccount2({ record }) {
                 <Text style={styles.date}>Data: {new Date(record.date).toLocaleDateString()}</Text>
             </View>
 
-            {/* Ícone de seta */}
             <EvilIcons name="arrow-right" size={26} color="#CCCCCC" />
         </View>
     );
@@ -25,7 +24,7 @@ const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',  // fundo cinza claro
+        backgroundColor: '#F5F5F5', 
         padding: 15,
         borderRadius: 15,
         shadowColor: '#000',
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
     logo: {
         width: 50,
         height: 50,
-        borderRadius: 10,  // cantos arredondados para a imagem
+        borderRadius: 10, 
     },
     infoContainer: {
         flex: 1,

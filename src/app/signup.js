@@ -1,6 +1,6 @@
 import { View, StyleSheet, Text, TextInput, Alert, ScrollView, Picker } from 'react-native';
 import { useState } from "react";
-import Button from '../Views/components/Button.js';
+import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 
 export default function SignUp() {
@@ -125,7 +125,9 @@ export default function SignUp() {
       </Picker>
 
       {/* Botão de Cadastro */}
-      <Button onPress={handleCreateAccount} title="Cadastrar" />
+      <Button onPress={handleCreateAccount}>
+        Cadastrar-se
+      </Button>
     </ScrollView>
   );
 }
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#8CABCD',
+    backgroundColor: '#ffffff',
   },
   label: {
     fontSize: 16,
@@ -160,18 +162,5 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#F5F7FA',
     color: '#466684',
-  },
-  button: {
-    backgroundColor: '#7B9ABB',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginVertical: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
   },
 });

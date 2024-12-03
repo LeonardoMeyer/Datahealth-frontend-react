@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
-import Button from '../views/components/Button';
+import Button from '../Views/components/Button';
 
 export default function CreateDoctor({ navigation }) {
   const [form, setForm] = useState({

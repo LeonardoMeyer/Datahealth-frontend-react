@@ -6,7 +6,6 @@ export default function DoctorList({ navigation }) {
   const [doctors, setDoctors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch doctors from backend
   const fetchDoctors = async () => {
     try {
       const response = await fetch('http://localhost:3000/doctors');
@@ -20,7 +19,6 @@ export default function DoctorList({ navigation }) {
     }
   };
 
-  // Delete doctor by ID
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/doctors/${id}`, {

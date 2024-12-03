@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Text, TextInput, Alert } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TextInput, Alert, Image } from 'react-native';
 import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -43,6 +43,9 @@ export default function Login() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
+        
+        <Image source={require('../../logo/logo.svg')} style={styles.logo} />
+        
         <Text style={styles.title}>Bem-vindo</Text>
         <Text style={styles.subtitle}>Faça login para continuar</Text>
 
@@ -91,6 +94,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  logo: {
+    width: 150, 
+    height: 150,
+    marginBottom: 20, 
   },
   title: {
     fontSize: 26,

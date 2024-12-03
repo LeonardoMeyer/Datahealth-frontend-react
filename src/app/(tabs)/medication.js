@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, View, Text, FlatList, Alert } from 'react-native';
 
-const API_URL = 'https://api.fda.gov/drug/label.json?limit=100'; // URL da API OpenFDA
+const API_URL = 'https://api.fda.gov/drug/label.json?limit=100';
 
 export default function MedicationList() {
   const [medications, setMedications] = useState([]);

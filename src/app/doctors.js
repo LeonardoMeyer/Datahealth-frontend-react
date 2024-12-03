@@ -9,10 +9,10 @@ export default function Doctors() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch('http://localhost:3000/doctor/list'); // Ajuste a URL
+      const response = await fetch('http://localhost:3000/doctor/list');
       if (!response.ok) throw new Error('Erro ao buscar médicos');
       const data = await response.json();
-      setDoctors(data.doctors); // Atualiza o estado com a lista de médicos
+      setDoctors(data.doctors);
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -23,12 +23,10 @@ export default function Doctors() {
     fetchDoctors();
   }, []);
 
-  // Função para navegar para a página de atualização de médico
   const handleUpdate = (id) => {
     router.push(`/update-doctor/${id}`);
   };
 
-  // Função para excluir um médico
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/doctor/${id}`, {
@@ -36,18 +34,16 @@ export default function Doctors() {
       });
       if (!response.ok) throw new Error('Erro ao excluir médico');
       Alert.alert('Sucesso', 'Médico excluído com sucesso');
-      fetchDoctors(); // Atualiza a lista
+      fetchDoctors();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
-  // Função para adicionar um novo médico
   const handleAdd = () => {
     router.push('/add-doctor');
   };
 
-  // Renderiza cada item da lista de médicos
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.name}</Text>
