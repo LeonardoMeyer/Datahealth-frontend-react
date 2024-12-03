@@ -17,7 +17,7 @@ export default function Login() {
       email: txtEmail,
       pass: txtPass,
     };
-
+  
     const response = await fetch('http://localhost:3000/auth/login', {
       method: 'POST',
       headers: {
@@ -25,20 +25,32 @@ export default function Login() {
       },
       body: JSON.stringify(login),
     });
-
+  
     if (response.ok) {
       const data = await response.json();
-      console.log(data);
-      loginStore({ accessToken: data?.accessToken, ...data.user });
-      await storeObjectData('userLogged', { accessToken: data?.accessToken, ...data.user });
+      console.log('Login bem-sucedido:', data);
+  
+      // Agora passamos a profileImage também
+      loginStore({
+        accessToken: data?.accessToken,
+        public_id: data?.public_id,
+        name: data?.user?.name,
+        avatar: data?.user?.avatar,
+        email: data?.user?.email,
+        profileImage: data?.user?.profileImage, // Inclui a imagem de perfil
+      });
+  
+      await storeObjectData('userLogged', { ...data?.user, accessToken: data?.accessToken });
+  
+      // Redireciona para a home
       router.push('/home');
     } else {
       const data = await response.json();
       Alert.alert('Erro ao logar');
       console.log(data?.error);
     }
-    return;
   };
+  
 
   return (
     <ScrollView style={styles.container}>

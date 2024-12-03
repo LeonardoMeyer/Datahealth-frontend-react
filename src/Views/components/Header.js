@@ -5,27 +5,19 @@ import { useLoginStore } from '../../stores/useLoginStore';
 
 export default function Header() {
   const router = useRouter(); 
-  const { user, logout } = useLoginStore(); 
+  const { user } = useLoginStore(); // Obtém o usuário logado
 
   const handleLogoPress = () => {
     router.push('/'); 
   };
 
   const handleProfilePress = () => {
-    router.push('/profile'); 
-  };
-
-  const handleLoginPress = () => {
-    router.push('/login'); 
-  };
-
-  const handleLogoutPress = () => {
-    logout(); 
-    router.push('/'); 
+    router.push('/profile'); // Sempre vai para o perfil se o usuário estiver logado
   };
 
   return (
     <View style={styles.header}>
+      {/* Logo que ao ser pressionada redireciona para a Home */}
       <TouchableOpacity onPress={handleLogoPress}>
         <Image 
           source={require('../../../logo/logo.svg')} 
@@ -33,20 +25,17 @@ export default function Header() {
         />
       </TouchableOpacity>
 
+      {/* Título "Datahealth" */}
       <Text style={styles.title}>Datahealth</Text>
 
-      {user ? (
-        <View style={styles.profileContainer}>
-          <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
-            <Text style={styles.profileText}>{user?.name}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogoutPress} style={styles.logoutButton}>
-            <Text style={styles.profileText}>Sair</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <TouchableOpacity onPress={handleLoginPress} style={styles.loginButton}>
-          <Text style={styles.profileText}>Entrar</Text>
+      {/* Se o usuário estiver logado, exibe o nome e imagem de perfil */}
+      {user && (
+        <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
+          <Image 
+            source={{ uri: user.profileImage }}  // Acessa a imagem do perfil
+            style={styles.profileImage}
+          />
+          <Text style={styles.profileText}>{user.name}</Text>  {/* Exibe o nome do usuário */}
         </TouchableOpacity>
       )}
     </View>
@@ -57,49 +46,33 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: '#ffffff', 
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'row', // Alinha os itens horizontalmente
+    justifyContent: 'flex-start', // Deixa a logo e o título à esquerda
+    alignItems: 'center', // Alinha verticalmente os itens
   },
   logo: {
     width: 40, 
     height: 40, 
-    marginRight: 10,
+    marginRight: 10, // Espaço entre logo e o título
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#6c8ebf', 
-  },
-  profileContainer: {
-    flexDirection: 'row', 
-    alignItems: 'center',
+    flex: 1, // Isso garante que o título ocupe o espaço restante
   },
   profileButton: {
-    padding: 10,
-    backgroundColor: '#6c8ebf', 
-    borderRadius: 8,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
   },
-  logoutButton: {
-    padding: 10,
-    backgroundColor: '#ff3b30', 
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
-  },
-  loginButton: {
-    padding: 10,
-    backgroundColor: '#6c8ebf', 
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,  // Espaço entre a imagem do perfil e o nome do usuário
   },
   profileText: {
     fontSize: 16,
-    color: '#fff',
+    color: '#6c8ebf',
   },
 });

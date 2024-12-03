@@ -1,18 +1,20 @@
-import { create } from "zustand"
+import { create } from 'zustand';
 
 export const useLoginStore = create((set) => ({
     accessToken: '',
     public_id: '',
     name: '',
-    avatar: '', 
+    avatar: '',
     email: '',
+    profileImage: '', 
 
-    login: (userLogin) => set({...userLogin}),
+    login: (userLogin) => set({ ...userLogin }),
     logout: () => set({
         accessToken: '',
         public_id: '',
         name: '',
-        avatar: '', 
-        email: ''
-    })
-}))
+        avatar: '',
+        email: '',
+        profileImage: '',
+    }),
+}));
