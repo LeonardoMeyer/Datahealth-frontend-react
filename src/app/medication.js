@@ -1,58 +1,131 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Text, FlatList, Alert } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
+import Button from '../Views/components/Button';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { useLoginStore } from '../stores/useLoginStore';
+import { fetchAuth } from '../utils/fetchAuth'; 
 
-const API_URL = 'https://api.fda.gov/drug/label.json?limit=100';
-
-export default function MedicationList() {
+export default function Medications() {
+  const router = useRouter();
   const [medications, setMedications] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fetchMedications();
-  }, []);
+  const accessToken = useLoginStore.getState().accessToken;
 
   const fetchMedications = async () => {
-    setLoading(true);
     try {
-      const response = await fetch(API_URL);
+      const response = await fetchAuth('http://localhost:3000/medication/list', { 
+        method: 'GET', 
+      });
+      if (!response.ok) throw new Error('Erro ao buscar registros');
       const data = await response.json();
-      if (data.results && data.results.length > 0) {
-        const medicationsList = data.results.map((item, index) => ({
-          id: index + 1,
-          nome: item.openfda.brand_name?.[0] || 'Nome Desconhecido',
-          fabricante: item.openfda.manufacturer_name?.[0] || 'Fabricante Desconhecido',
-        }));
-        setMedications(medicationsList);
-      } else {
-        Alert.alert('Nenhum resultado', 'A API não retornou nenhum medicamento.');
-      }
+      setMedications(data.medications);
     } catch (error) {
-      console.error('Erro ao buscar medicamentos:', error);
-      Alert.alert('Erro', 'Não foi possível buscar os medicamentos.');
-    } finally {
-      setLoading(false);
+      Alert.alert('Erro', error.message);
     }
   };
 
+  const handleCreateMedication = async () => {
+    // Simulating new medication with unique ID
+    const newMedication = {
+      id: Date.now(), // Generates a unique ID based on timestamp
+      medicine: 'Relatório Atualizado',
+      image: 'http://example.com/exam-updated.jpg',
+      description: 'Receita médica atualizada',
+      period: '7',
+    };
+
+    try {
+      const response = await fetchAuth('http://localhost:3000/medication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',  // Ensure the content type is set correctly
+        },
+        body: JSON.stringify(newMedication),
+      });
+
+      if (!response.ok) throw new Error('Erro ao criar registro');
+      const data = await response.json();
+      Alert.alert('Sucesso', 'Registro criado com sucesso');
+      fetchMedications(); 
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+  };
+
+  const handleUpdateMedication = async (id) => {
+    const updatedMedication = {
+      id: id,
+      medicine: 'Relatório Atualizado',
+      image: 'http://example.com/exam-updated.jpg',
+      description: 'Receita médica atualizada',
+      period: '7',
+    };
+
+    try {
+      const response = await fetchAuth(`http://localhost:3000/medication/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',  // Ensure the content type is set correctly
+        },
+        body: JSON.stringify(updatedMedication),
+      });
+
+      if (!response.ok) throw new Error('Erro ao atualizar registro');
+      const data = await response.json();
+      Alert.alert('Sucesso', 'Registro atualizado com sucesso');
+      fetchMedications(); 
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+  };
+
+  const handleDeleteMedication = async (id) => {
+    try {
+      const response = await fetchAuth(`http://localhost:3000/medication/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Erro ao excluir registro');
+      Alert.alert('Sucesso', 'Registro excluído com sucesso');
+      fetchMedications(); 
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchMedications(); 
+  }, []);
+
+  const renderMedication = ({ item }) => (
+    <View style={styles.card}>
+      <Text style={styles.doctorName}>{item.report}</Text>
+      <Text style={styles.specialty}>{item.date}</Text>
+      <View style={styles.buttonGroup}>
+        <Button onPress={() => handleUpdateMedication(item.id)} style={styles.updateButton}>
+          Atualizar
+        </Button>
+        <Button onPress={() => handleDeleteMedication(item.id)} style={styles.deleteButton}>
+          Excluir
+        </Button>
+      </View>
+    </View>
+  );
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Lista de Medicamentos</Text>
-      {loading ? (
-        <Text style={styles.loadingText}>Carregando...</Text>
-      ) : (
-        <FlatList
-          data={medications}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Text style={styles.medicationName}>{item.nome}</Text>
-              <Text style={styles.info}>Fabricante: {item.fabricante}</Text>
-            </View>
-          )}
-          ListEmptyComponent={<Text style={styles.emptyText}>Nenhum medicamento encontrado.</Text>}
-        />
-      )}
-    </ScrollView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Lista de Registros Médicos</Text>
+      <FlatList
+        data={medications}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderMedication}
+        ListEmptyComponent={() => (
+          <Text style={styles.emptyMessage}>Nenhum registro encontrado.</Text>
+        )}
+      />
+      <Button onPress={handleCreateMedication} style={styles.addButton}>
+        + Adicionar Novo Registro
+      </Button>
+    </View>
   );
 }
 
@@ -68,11 +141,6 @@ const styles = StyleSheet.create({
     color: '#7B9ABB',
     marginBottom: 20,
   },
-  loadingText: {
-    textAlign: 'center',
-    color: '#666666',
-    marginVertical: 10,
-  },
   card: {
     backgroundColor: '#FFFFFF',
     padding: 15,
@@ -83,18 +151,43 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  medicationName: {
+  doctorName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  info: {
+  specialty: {
     fontSize: 16,
     color: '#666666',
-    marginTop: 5,
+    marginBottom: 10,
   },
-  emptyText: {
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  updateButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  deleteButton: {
+    backgroundColor: '#FF5722',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  addButton: {
+    backgroundColor: '#7B9ABB',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+  emptyMessage: {
     textAlign: 'center',
-    color: '#999999',
+    fontSize: 16,
+    color: '#666',
     marginTop: 20,
   },
 });
