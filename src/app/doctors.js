@@ -18,27 +18,8 @@ export default function Doctors() {
     }
   };
 
-  const handleUpdate = async (id, updatedDoctor) => {
-    try {
-      const response = await fetch(`http://localhost:3000/doctor/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedDoctor),
-      });
-
-<<<<<<< HEAD
   const handleUpdate = (id) => {
     router.push(`/update-doctor/${id}`);
-=======
-      if (!response.ok) throw new Error('Erro ao atualizar médico');
-      Alert.alert('Sucesso', 'Médico atualizado com sucesso');
-      fetchDoctors();
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
->>>>>>> e8a30f4d2e2c20db66df4b2fab726bdd22fa5c3b
   };
 
   const handleDelete = async (id) => {
@@ -58,19 +39,16 @@ export default function Doctors() {
     router.push('/add-doctor');
   };
 
-<<<<<<< HEAD
-=======
   useEffect(() => {
     fetchDoctors();
   }, []);
 
->>>>>>> e8a30f4d2e2c20db66df4b2fab726bdd22fa5c3b
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.name}</Text>
       <Text style={styles.specialty}>{item.specialization}</Text>
       <View style={styles.buttonGroup}>
-        <Button onPress={() => handleUpdate(item.id, { name: item.name, specialization: item.specialization })} style={styles.updateButton}>
+        <Button onPress={() => handleUpdate(item.id)} style={styles.updateButton}>
           Atualizar
         </Button>
         <Button onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
