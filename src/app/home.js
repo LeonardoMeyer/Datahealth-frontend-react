@@ -22,8 +22,8 @@ export default function Home() {
           <Button onPress={() => router.push('/medication')} style={styles.button}>
             Medicação
           </Button>
-          <Button onPress={() => router.push('/prescriptions')} style={styles.button}>
-            Receitas
+          <Button onPress={() => router.push('/record')} style={styles.button}>
+            Prontuarios
           </Button>
           <Button onPress={() => router.push('/doctors')} style={styles.button}>
             Médicos

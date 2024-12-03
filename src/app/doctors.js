@@ -9,26 +9,33 @@ export default function Doctors() {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch('http://localhost:3000/doctor/list'); // Ajuste a URL
+      const response = await fetch('http://localhost:3000/doctor/list');
       if (!response.ok) throw new Error('Erro ao buscar médicos');
       const data = await response.json();
-      setDoctors(data.doctors); // Atualiza o estado com a lista de médicos
+      setDoctors(data.doctors);
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
-  
 
-  useEffect(() => {
-    fetchDoctors();
-  }, []);
+  const handleUpdate = async (id, updatedDoctor) => {
+    try {
+      const response = await fetch(`http://localhost:3000/doctor/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedDoctor),
+      });
 
-  // Função para navegar para a página de atualização de médico
-  const handleUpdate = (id) => {
-    router.push(`/update-doctor/${id}`);
+      if (!response.ok) throw new Error('Erro ao atualizar médico');
+      Alert.alert('Sucesso', 'Médico atualizado com sucesso');
+      fetchDoctors();
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
   };
 
-  // Função para excluir um médico
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/doctor/${id}`, {
@@ -36,24 +43,26 @@ export default function Doctors() {
       });
       if (!response.ok) throw new Error('Erro ao excluir médico');
       Alert.alert('Sucesso', 'Médico excluído com sucesso');
-      fetchDoctors(); // Atualiza a lista
+      fetchDoctors();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
-  // Função para adicionar um novo médico
   const handleAdd = () => {
     router.push('/add-doctor');
   };
 
-  // Renderiza cada item da lista de médicos
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.name}</Text>
       <Text style={styles.specialty}>{item.specialization}</Text>
       <View style={styles.buttonGroup}>
-        <Button onPress={() => handleUpdate(item.id)} style={styles.updateButton}>
+        <Button onPress={() => handleUpdate(item.id, { name: item.name, specialization: item.specialization })} style={styles.updateButton}>
           Atualizar
         </Button>
         <Button onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
