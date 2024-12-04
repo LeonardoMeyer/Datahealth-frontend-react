@@ -1,3 +1,4 @@
+// src/pages/Login.js
 import { ScrollView, StyleSheet, View, Text, TextInput, Alert, Image } from 'react-native';
 import Button from '../Views/components/Button.js';
 import { useRouter } from 'expo-router';
@@ -17,7 +18,7 @@ export default function Login() {
       email: txtEmail,
       pass: txtPass,
     };
-  
+
     const response = await fetch('http://localhost:3000/auth/login', {
       method: 'POST',
       headers: {
@@ -25,24 +26,21 @@ export default function Login() {
       },
       body: JSON.stringify(login),
     });
-  
+
     if (response.ok) {
       const data = await response.json();
       console.log('Login bem-sucedido:', data);
-  
-      // Agora passamos a profileImage também
+
+      // Atualiza o estado global com os dados do usuário
       loginStore({
         accessToken: data?.accessToken,
         public_id: data?.public_id,
         name: data?.user?.name,
         avatar: data?.user?.avatar,
         email: data?.user?.email,
-        profileImage: data?.user?.profileImage, // Inclui a imagem de perfil
       });
-  
-      await storeObjectData('userLogged', { ...data?.user, accessToken: data?.accessToken });
-  
-      // Redireciona para a home
+
+      // Redireciona para a home após o login
       router.push('/home');
     } else {
       const data = await response.json();
@@ -50,14 +48,11 @@ export default function Login() {
       console.log(data?.error);
     }
   };
-  
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.formContainer}>
-        
         <Image source={require('../../logo/logo.svg')} style={styles.logo} />
-        
         <Text style={styles.title}>Bem-vindo</Text>
         <Text style={styles.subtitle}>Faça login para continuar</Text>
 

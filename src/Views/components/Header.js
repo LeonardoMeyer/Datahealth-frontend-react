@@ -1,3 +1,4 @@
+// src/components/Header.js
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
 import { useRouter } from 'expo-router'; 
@@ -9,10 +10,6 @@ export default function Header() {
 
   const handleLogoPress = () => {
     router.push('/'); 
-  };
-
-  const handleProfilePress = () => {
-    router.push('/profile'); // Sempre vai para o perfil se o usuário estiver logado
   };
 
   return (
@@ -28,14 +25,18 @@ export default function Header() {
       {/* Título "Datahealth" */}
       <Text style={styles.title}>Datahealth</Text>
 
-      {/* Se o usuário estiver logado, exibe o nome e imagem de perfil */}
-      {user && (
-        <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
+      {/* Exibindo o nome do usuário ou botão de login */}
+      {user ? (
+        <View style={styles.profileContainer}>
           <Image 
-            source={{ uri: user.profileImage }}  // Acessa a imagem do perfil
-            style={styles.profileImage}
+            source={{ uri: user.avatar }} 
+            style={styles.profileImage} 
           />
-          <Text style={styles.profileText}>{user.name}</Text>  {/* Exibe o nome do usuário */}
+          <Text style={styles.profileText}>{user.name}</Text>
+        </View>
+      ) : (
+        <TouchableOpacity onPress={() => router.push('/login')}>
+          <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#ffffff', 
     flexDirection: 'row', // Alinha os itens horizontalmente
-    justifyContent: 'flex-start', // Deixa a logo e o título à esquerda
+    justifyContent: 'space-between', // Alinha logo, título e usuário na mesma linha
     alignItems: 'center', // Alinha verticalmente os itens
   },
   logo: {
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     color: '#6c8ebf', 
     flex: 1, // Isso garante que o título ocupe o espaço restante
   },
-  profileButton: {
+  profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -74,5 +75,9 @@ const styles = StyleSheet.create({
   profileText: {
     fontSize: 16,
     color: '#6c8ebf',
+  },
+  loginText: {
+    fontSize: 16,
+    color: '#007AFF',
   },
 });

@@ -1,3 +1,4 @@
+// src/pages/Home.js
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View, Text, Image } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -16,13 +17,6 @@ export default function Home() {
     setIsMounted(true); // Marca que o componente foi montado
   }, []);
 
-  // Redireciona para o login se o usuário não estiver logado e o componente estiver montado
-  useEffect(() => {
-    if (isMounted && !user) {
-      router.push('/login'); // Se não estiver logado, redireciona para login
-    }
-  }, [user, isMounted]);
-
   return (
     <ScrollView style={styles.container}>
       <Header />
@@ -30,7 +24,7 @@ export default function Home() {
         {user ? (
           <View style={styles.profileContainer}>
             <Image 
-              source={{ uri: user.profileImage }} 
+              source={{ uri: user.avatar }} 
               style={styles.profileImage} 
             />
             <Text style={styles.profileName}>{user.name}</Text>
