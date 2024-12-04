@@ -1,15 +1,16 @@
-// src/components/Header.js
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
-import { useRouter } from 'expo-router'; 
 import { useLoginStore } from '../../stores/useLoginStore'; 
-
 export default function Header() {
-  const router = useRouter(); 
-  const { user } = useLoginStore(); // Obtém o usuário logado
+  const { name, avatar } = useLoginStore();
 
+ 
   const handleLogoPress = () => {
-    router.push('/'); 
+    window.location.href = '/'; 
+  };
+
+  const handleCreateAccountPress = () => {
+    window.location.href = '/create-account';
   };
 
   return (
@@ -25,20 +26,16 @@ export default function Header() {
       {/* Título "Datahealth" */}
       <Text style={styles.title}>Datahealth</Text>
 
-      {/* Exibindo o nome do usuário ou botão de login */}
-      {user ? (
-        <View style={styles.profileContainer}>
-          <Image 
-            source={{ uri: user.avatar }} 
-            style={styles.profileImage} 
-          />
-          <Text style={styles.profileText}>{user.name}</Text>
-        </View>
-      ) : (
-        <TouchableOpacity onPress={() => router.push('/login')}>
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
-      )}
+      {/* Informações do usuário e ícone de menu */}
+      <View style={styles.profileContainer}>
+        <Image 
+          style={styles.avatar}
+          source={avatar} 
+        />
+        <Text style={styles.name}>{name}</Text>
+
+       
+      </View>
     </View>
   );
 }
@@ -47,37 +44,36 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     backgroundColor: '#ffffff', 
-    flexDirection: 'row', // Alinha os itens horizontalmente
-    justifyContent: 'space-between', // Alinha logo, título e usuário na mesma linha
-    alignItems: 'center', // Alinha verticalmente os itens
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
   },
   logo: {
     width: 40, 
     height: 40, 
-    marginRight: 10, // Espaço entre logo e o título
+    marginRight: 10, 
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#6c8ebf', 
-    flex: 1, // Isso garante que o título ocupe o espaço restante
+    flex: 1, 
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileImage: {
+  avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 10,  // Espaço entre a imagem do perfil e o nome do usuário
+    marginRight: 10,  
   },
-  profileText: {
+  name: {
     fontSize: 16,
     color: '#6c8ebf',
   },
-  loginText: {
-    fontSize: 16,
-    color: '#007AFF',
+  menu: {
+    marginLeft: 20, 
   },
 });

@@ -69,9 +69,8 @@ export default function Doctors() {
           <Text style={styles.emptyMessage}>Nenhum médico encontrado.</Text>
         )}
       />
-      <Button onPress={handleAdd} style={styles.addButton}>
-        + Adicionar Novo Médico
-      </Button>
+               <Button onPress={() => router.push('/create-doctor')}>Criar medico</Button>
+
     </View>
   );
 }

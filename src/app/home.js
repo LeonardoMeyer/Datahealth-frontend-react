@@ -1,38 +1,16 @@
-// src/pages/Home.js
-import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View, Text, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
 import Header from '../Views/components/Header.js';
 import Footer from '../Views/components/Footer.js';
 import Button from '../Views/components/Button.js';
-import { useLoginStore } from '../stores/useLoginStore.js'; // Importando o store para acessar o usuário logado
+import { useRouter } from 'expo-router';
 
 export default function Home() {
   const router = useRouter();
-  const { user } = useLoginStore(); // Acessando o usuário logado
-  const [isMounted, setIsMounted] = useState(false); // Estado para controlar o montamento do componente
-
-  // Verifica se o componente foi montado
-  useEffect(() => {
-    setIsMounted(true); // Marca que o componente foi montado
-  }, []);
 
   return (
     <ScrollView style={styles.container}>
       <Header />
       <View style={styles.content}>
-        {user ? (
-          <View style={styles.profileContainer}>
-            <Image 
-              source={{ uri: user.avatar }} 
-              style={styles.profileImage} 
-            />
-            <Text style={styles.profileName}>{user.name}</Text>
-          </View>
-        ) : (
-          <Text style={styles.guestMessage}>Você não está logado.</Text>
-        )}
-
         <View style={styles.buttonContainer}>
           <Button onPress={() => router.push('/create-record')} style={styles.button}>
             Novo Registro
@@ -41,7 +19,7 @@ export default function Home() {
             Medicação
           </Button>
           <Button onPress={() => router.push('/record')} style={styles.button}>
-            Prontuários
+            Prontuarios
           </Button>
           <Button onPress={() => router.push('/doctors')} style={styles.button}>
             Médicos
@@ -62,28 +40,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
-  },
-  profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  guestMessage: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
   },
   buttonContainer: {
     marginTop: 20,

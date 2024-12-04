@@ -12,7 +12,7 @@ export default function SignUp() {
     pass: '',
     avatar: '',
     age: '',
-    ethnicity: '',  // Adicionando o campo de etnia
+    ethnicity: '', 
     gender: '',
     blood_type: '',
   });
@@ -41,7 +41,7 @@ export default function SignUp() {
 
       if (response.ok) {
         Alert.alert('Sucesso', 'Usuário criado com sucesso!');
-        router.back(); // Retorna para a tela anterior
+        router.back(); 
       } else {
         const data = await response.json();
         Alert.alert('Erro', data?.error || 'Erro desconhecido ao criar o usuário.');

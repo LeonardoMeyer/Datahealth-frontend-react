@@ -57,8 +57,9 @@ export default function DoctorList({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button onPress={() => navigation.navigate('CreateDoctor')}>Adicionar Médico</Button>
-      {isLoading ? (
+ <Button onPress={() => router.push('/CreateDoctor')} style={styles.signupButton}>
+          Cadastre-se
+        </Button>      {isLoading ? (
         <Text>Carregando...</Text>
       ) : (
         <FlatList
