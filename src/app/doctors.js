@@ -1,14 +1,42 @@
-import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Alert, TextInput } from 'react-native'; 
 import { Picker } from '@react-native-picker/picker';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 export default function Doctors() {
-  const router = useRouter();
   const [doctors, setDoctors] = useState([]);
   const [specialization, setSpecialization] = useState('');
   const [gender, setGender] = useState('');
+  const [editingDoctor, setEditingDoctor] = useState(null); 
+  const [doctorData, setDoctorData] = useState({
+    name: '',
+    specialization: '',
+    gender: '',
+  });
+
+  // Lista de especializações adicionais
+  const specializationsList = [
+    "Cardiologia",
+    "Pediatria",
+    "Dermatologia",
+    "Neurologia",
+    "Ortopedia",
+    "Oftalmologia",
+    "Psicologia",
+    "Endocrinologia",
+    "Ginecologia",
+
+  ];
+
+  const genderList = [
+    "Mulher",
+    "Homem",
+    "Trans",
+    "Não-binário",
+    "Outro",
+  ];
+
 
   const fetchDoctors = async () => {
     try {
@@ -21,8 +49,30 @@ export default function Doctors() {
     }
   };
 
-  const handleUpdate = (id) => {
-    router.push(`/update-doctor/${id}`);
+  const handleEdit = (doctor) => {
+    setEditingDoctor(doctor.id); 
+    setDoctorData({
+      name: doctor.name,
+      specialization: doctor.specialization,
+      gender: doctor.gender,
+    });
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/doctor/${editingDoctor}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(doctorData),
+      });
+
+      if (!response.ok) throw new Error('Erro ao atualizar médico');
+      Alert.alert('Sucesso', 'Médico atualizado com sucesso');
+      setEditingDoctor(null);
+      fetchDoctors(); 
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -38,10 +88,6 @@ export default function Doctors() {
     }
   };
 
-  const handleAdd = () => {
-    router.push('/create-doctor');
-  };
-
   useEffect(() => {
     fetchDoctors();
   }, []);
@@ -52,7 +98,7 @@ export default function Doctors() {
       <Text style={styles.specialty}>Especialização: {item.specialization}</Text>
       <Text style={styles.specialty}>Gênero: {item.gender}</Text>
       <View style={styles.buttonGroup}>
-        <Button onPress={() => handleUpdate(item.id)} style={styles.updateButton}>
+        <Button onPress={() => handleEdit(item)} style={styles.updateButton}>
           Atualizar
         </Button>
         <Button onPress={() => handleDelete(item.id)} style={styles.deleteButton}>
@@ -66,7 +112,6 @@ export default function Doctors() {
     <View style={styles.container}>
       <Text style={styles.title}>Lista de Médicos</Text>
 
-      {/* Filtros */}
       <Text style={styles.label}>Especialização:</Text>
       <Picker
         selectedValue={specialization}
@@ -74,27 +119,9 @@ export default function Doctors() {
         style={styles.picker}
       >
         <Picker.Item label="Selecione" value="" />
-        <Picker.Item label="Cardiologia" value="cardiologia" />
-        <Picker.Item label="Pediatria" value="pediatria" />
-        <Picker.Item label="Dermatologia" value="dermatologia" />
-        <Picker.Item label="Ortopedia" value="ortopedia" />
-        <Picker.Item label="Neurologia" value="neurologia" />
-        <Picker.Item label="Psiquiatria" value="psiquiatria" />
-        <Picker.Item label="Ginecologia" value="ginecologia" />
-        <Picker.Item label="Urologia" value="urologia" />
-        <Picker.Item label="Oftalmologia" value="oftalmologia" />
-        <Picker.Item label="Otorrinolaringologia" value="otorrinolaringologia" />
-        <Picker.Item label="Endocrinologia" value="endocrinologia" />
-        <Picker.Item label="Hematologia" value="hematologia" />
-        <Picker.Item label="Oncologia" value="oncologia" />
-        <Picker.Item label="Infectologia" value="infectologia" />
-        <Picker.Item label="Reumatologia" value="reumatologia" />
-        <Picker.Item label="Gastroenterologia" value="gastroenterologia" />
-        <Picker.Item label="Nefrologia" value="nefrologia" />
-        <Picker.Item label="Anestesiologia" value="anestesiologia" />
-        <Picker.Item label="Cirurgia Geral" value="cirurgia-geral" />
-        <Picker.Item label="Medicina do Trabalho" value="medicina-do-trabalho" />
-        <Picker.Item label="Clínica Geral" value="clinica-geral" />
+        {specializationsList.map((spec, index) => (
+          <Picker.Item key={index} label={spec} value={spec.toLowerCase()} />
+        ))}
       </Picker>
 
       <Text style={styles.label}>Gênero:</Text>
@@ -104,11 +131,9 @@ export default function Doctors() {
         style={styles.picker}
       >
         <Picker.Item label="Selecione" value="" />
-        <Picker.Item label="Mulher" value="mulher" />
-        <Picker.Item label="Homem" value="homem" />
-        <Picker.Item label="Trans" value="trans" />
-        <Picker.Item label="Não-binário" value="nao-binario" />
-        <Picker.Item label="Outro" value="outro" />
+        {genderList.map((g, index) => (
+          <Picker.Item key={index} label={g} value={g.toLowerCase()} />
+        ))}
       </Picker>
 
       <FlatList
@@ -123,7 +148,48 @@ export default function Doctors() {
           <Text style={styles.emptyMessage}>Nenhum médico encontrado.</Text>
         )}
       />
-      <Button onPress={handleAdd} style={styles.addButton}>
+
+      {editingDoctor && (
+        <View style={styles.editForm}>
+          <Text style={styles.title}>Atualizar Médico</Text>
+          <Text style={styles.label}>Nome:</Text>
+          <TextInput
+            value={doctorData.name}
+            onChangeText={(text) => setDoctorData({ ...doctorData, name: text })}
+            style={styles.input}
+          />
+          <Text style={styles.label}>Especialização:</Text>
+          <Picker
+            selectedValue={doctorData.specialization}
+            onValueChange={(value) => setDoctorData({ ...doctorData, specialization: value })}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecione" value="" />
+            {specializationsList.map((spec, index) => (
+              <Picker.Item key={index} label={spec} value={spec.toLowerCase()} />
+            ))}
+          </Picker>
+          <Text style={styles.label}>Gênero:</Text>
+          <Picker
+            selectedValue={doctorData.gender}
+            onValueChange={(value) => setDoctorData({ ...doctorData, gender: value })}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecione" value="" />
+            {genderList.map((g, index) => (
+              <Picker.Item key={index} label={g} value={g.toLowerCase()} />
+            ))}
+          </Picker>
+          <Button onPress={handleUpdate} style={styles.updateButton}>
+            Atualizar Médico
+          </Button>
+          <Button onPress={() => setEditingDoctor(null)} style={styles.cancelButton}>
+            Cancelar
+          </Button>
+        </View>
+      )}
+
+      <Button onPress={() => router.push('/create-doctor')} style={styles.addButton}>
         Criar Médico
       </Button>
     </View>
@@ -202,5 +268,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginTop: 20,
+  },
+  editForm: {
+    marginTop: 20,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 8,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginTop: 10,
   },
 });
