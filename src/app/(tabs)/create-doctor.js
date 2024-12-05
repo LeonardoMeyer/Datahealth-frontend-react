@@ -13,7 +13,6 @@ export default function CreateDoctor({ navigation }) {
     avatar: '', 
   });
 
-  // Função para validar o formulário
   const validateForm = () => {
     if (!form.name || !form.email || !form.specialization || !form.age || !form.gender) {
       Alert.alert('Erro', 'Todos os campos obrigatórios devem ser preenchidos!');
@@ -23,10 +22,8 @@ export default function CreateDoctor({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    // Validação do formulário
     if (!validateForm()) return;
 
-    // Montando o payload
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
@@ -36,10 +33,9 @@ export default function CreateDoctor({ navigation }) {
       avatar: form.avatar.trim() || null,
     };
 
-    console.log('Payload enviado:', JSON.stringify(payload, null, 2)); // Log do payload
+    console.log('Payload enviado:', JSON.stringify(payload, null, 2)); 
 
     try {
-      // Enviando a requisição para o back-end
       const response = await fetch('http://localhost:3000/doctor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,7 +43,7 @@ export default function CreateDoctor({ navigation }) {
       });
 
       const responseData = await response.json();
-      console.log('Resposta do servidor:', responseData); // Log da resposta
+      console.log('Resposta do servidor:', responseData); 
 
       if (!response.ok) {
         throw new Error(responseData.message || 'Erro ao cadastrar médico.');
