@@ -26,7 +26,6 @@ export default function CreateAccount() {
     checkPermissions();
   }, []);
 
-  // Função para abrir a galeria e escolher a imagem
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaType: ImagePicker.MediaTypeOptions.Images,

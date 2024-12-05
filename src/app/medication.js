@@ -24,9 +24,8 @@ export default function Medications() {
   };
 
   const handleCreateMedication = async () => {
-    // Simulating new medication with unique ID
     const newMedication = {
-      id: Date.now(), // Generates a unique ID based on timestamp
+      id: Date.now(), 
       medicine: 'Relatório Atualizado',
       image: 'http://example.com/exam-updated.jpg',
       description: 'Receita médica atualizada',
@@ -37,7 +36,7 @@ export default function Medications() {
       const response = await fetchAuth('http://localhost:3000/medication', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',  // Ensure the content type is set correctly
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(newMedication),
       });
@@ -64,7 +63,7 @@ export default function Medications() {
       const response = await fetchAuth(`http://localhost:3000/medication/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',  // Ensure the content type is set correctly
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedMedication),
       });

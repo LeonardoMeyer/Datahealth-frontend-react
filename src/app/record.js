@@ -3,18 +3,17 @@ import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useLoginStore } from '../stores/useLoginStore';
-import { fetchAuth } from '../utils/fetchAuth';  // Importando a função fetchAuth
+import { fetchAuth } from '../utils/fetchAuth';
 
 export default function Records() {
   const router = useRouter();
   const [records, setRecords] = useState([]);
   const accessToken = useLoginStore.getState().accessToken;
 
-  // Função para buscar registros
   const fetchRecords = async () => {
     try {
       const response = await fetchAuth('http://localhost:3000/record/list', { 
-        method: 'GET', // Método GET para listar os registros
+        method: 'GET',
       });
       if (!response.ok) throw new Error('Erro ao buscar registros');
       const data = await response.json();
@@ -24,7 +23,6 @@ export default function Records() {
     }
   };
 
-  // Função para criar um novo registro
   const handleCreateRecord = async () => {
     const newRecord = {
       report: 'Novo Relatório',
@@ -34,7 +32,6 @@ export default function Records() {
     };
 
     try {
-      // Utiliza fetchAuth para garantir a autenticidade do token
       const response = await fetchAuth('http://localhost:3000/record', {
         method: 'POST',
         body: JSON.stringify(newRecord),
@@ -43,13 +40,12 @@ export default function Records() {
       if (!response.ok) throw new Error('Erro ao criar registro');
       const data = await response.json();
       Alert.alert('Sucesso', 'Registro criado com sucesso');
-      fetchRecords(); // Atualiza a lista de registros
+      fetchRecords();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
-  // Função para atualizar um registro
   const handleUpdateRecord = async (id) => {
     const updatedRecord = {
       id: id,

@@ -4,7 +4,6 @@ import Header from './views/components/Header';
 import Footer from './views/components/Footer';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
-import colors from './src/colors';
 
 export default function App() {
   return (

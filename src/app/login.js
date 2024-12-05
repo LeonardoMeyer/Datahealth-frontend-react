@@ -44,7 +44,6 @@ export default function Login() {
   return (
       <ScrollView style={styles.container}>
         <View style={{ flex: 1, marginTop: 100, justifyContent: 'center', alignItems: 'center'}}>
-          
           <Text>Email:</Text>
           <TextInput 
             style={styles.input}

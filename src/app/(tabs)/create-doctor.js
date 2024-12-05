@@ -5,16 +5,16 @@ import Button from '../../Views/components/Button';
 
 export default function CreateDoctor({ navigation }) {
   const [form, setForm] = useState({
-    name: '', // Nome do médico
-    email: '', // Email do médico
-    age: '', // Idade do médico
-    gender: '', // Gênero do médico
-    specialization: '', // Especialização do médico
-    avatar: '', // URL ou caminho da imagem do avatar
+    name: '', 
+    email: '', 
+    age: '',
+    gender: '',
+    specialization: '',
+    avatar: '', 
   });
 
   const handleSubmit = async () => {
-    // Validação dos campos obrigatórios
+
     if (!form.name || !form.email || !form.specialization || !form.age || !form.gender) {
       Alert.alert('Erro', 'Todos os campos obrigatórios devem ser preenchidos!');
       return;
@@ -24,13 +24,13 @@ export default function CreateDoctor({ navigation }) {
       const payload = {
         name: form.name,
         email: form.email,
-        age: Number(form.age), // Garantir que 'age' seja um número
+        age: Number(form.age),
         gender: form.gender,
         specialization: form.specialization,
-        avatar: form.avatar || null, // Enviar null caso avatar esteja vazio
+        avatar: form.avatar || null,
       };
   
-      console.log('Payload enviado:', payload); // Log para depuração
+      console.log('Payload enviado:', payload); 
   
       const response = await fetch('http://localhost:3000/doctor', {
         method: 'POST',
@@ -44,7 +44,7 @@ export default function CreateDoctor({ navigation }) {
       }
   
       Alert.alert('Sucesso', 'Médico cadastrado com sucesso!');
-      navigation.goBack(); // Voltar para a tela anterior
+      navigation.goBack();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -77,7 +77,7 @@ export default function CreateDoctor({ navigation }) {
         value={form.age}
         onChangeText={(value) => setForm({ ...form, age: value })}
         placeholder="Digite a idade"
-        keyboardType="numeric" // Apenas números
+        keyboardType="numeric" 
       />
 
       <Text style={styles.label}>Gênero:</Text>
