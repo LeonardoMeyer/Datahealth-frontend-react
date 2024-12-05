@@ -13,45 +13,55 @@ export default function CreateDoctor({ navigation }) {
     avatar: '', 
   });
 
-  const handleSubmit = async () => {
-
+  // Função para validar o formulário
+  const validateForm = () => {
     if (!form.name || !form.email || !form.specialization || !form.age || !form.gender) {
       Alert.alert('Erro', 'Todos os campos obrigatórios devem ser preenchidos!');
-      return;
+      return false;
     }
-  
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    // Validação do formulário
+    if (!validateForm()) return;
+
+    // Montando o payload
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      age: Number(form.age),
+      gender: form.gender,
+      specialization: form.specialization,
+      avatar: form.avatar.trim() || null,
+    };
+
+    console.log('Payload enviado:', JSON.stringify(payload, null, 2)); // Log do payload
+
     try {
-      const payload = {
-        name: form.name,
-        email: form.email,
-        age: Number(form.age),
-        gender: form.gender,
-        specialization: form.specialization,
-        avatar: form.avatar || null,
-      };
-  
-      console.log('Payload enviado:', payload); 
-  
+      // Enviando a requisição para o back-end
       const response = await fetch('http://localhost:3000/doctor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-  
+
+      const responseData = await response.json();
+      console.log('Resposta do servidor:', responseData); // Log da resposta
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar médico.');
+        throw new Error(responseData.message || 'Erro ao cadastrar médico.');
       }
-  
+
+      // Caso tenha sucesso
       Alert.alert('Sucesso', 'Médico cadastrado com sucesso!');
       navigation.goBack();
     } catch (error) {
+      console.error('Erro no envio:', error);
       Alert.alert('Erro', error.message);
     }
   };
-  
-  
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Nome:</Text>
@@ -77,7 +87,7 @@ export default function CreateDoctor({ navigation }) {
         value={form.age}
         onChangeText={(value) => setForm({ ...form, age: value })}
         placeholder="Digite a idade"
-        keyboardType="numeric" 
+        keyboardType="numeric"
       />
 
       <Text style={styles.label}>Gênero:</Text>
@@ -109,11 +119,6 @@ export default function CreateDoctor({ navigation }) {
         <Picker.Item label="Psiquiatria" value="psiquiatria" />
         <Picker.Item label="Ginecologia" value="ginecologia" />
         <Picker.Item label="Urologia" value="urologia" />
-        <Picker.Item label="Endocrinologia" value="endocrinologia" />
-        <Picker.Item label="Oncologia" value="oncologia" />
-        <Picker.Item label="Infectologia" value="infectologia" />
-        <Picker.Item label="Reumatologia" value="reumatologia" />
-        <Picker.Item label="Cirurgia Geral" value="cirurgia-geral" />
       </Picker>
 
       <Text style={styles.label}>Avatar (URL):</Text>
