@@ -1,12 +1,13 @@
+import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useDoctorStore } from '../stores/useDoctorStore';
 
 export default function Doctors() {
   const router = useRouter();
-  const [doctors, setDoctors] = useState([]);
+  const { doctors, setDoctors, deleteDoctor } = useDoctorStore();
   const [specialization, setSpecialization] = useState('');
   const [gender, setGender] = useState('');
 
@@ -15,7 +16,7 @@ export default function Doctors() {
       const response = await fetch('http://localhost:3000/doctor/list');
       if (!response.ok) throw new Error('Erro ao buscar médicos');
       const data = await response.json();
-      setDoctors(data.doctors);
+      setDoctors(data.doctors); 
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -32,7 +33,8 @@ export default function Doctors() {
       });
       if (!response.ok) throw new Error('Erro ao excluir médico');
       Alert.alert('Sucesso', 'Médico excluído com sucesso');
-      fetchDoctors();
+      deleteDoctor(id); 
+      fetchDoctors(); 
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -75,26 +77,7 @@ export default function Doctors() {
       >
         <Picker.Item label="Selecione" value="" />
         <Picker.Item label="Cardiologia" value="cardiologia" />
-        <Picker.Item label="Pediatria" value="pediatria" />
-        <Picker.Item label="Dermatologia" value="dermatologia" />
-        <Picker.Item label="Ortopedia" value="ortopedia" />
-        <Picker.Item label="Neurologia" value="neurologia" />
-        <Picker.Item label="Psiquiatria" value="psiquiatria" />
-        <Picker.Item label="Ginecologia" value="ginecologia" />
-        <Picker.Item label="Urologia" value="urologia" />
-        <Picker.Item label="Oftalmologia" value="oftalmologia" />
-        <Picker.Item label="Otorrinolaringologia" value="otorrinolaringologia" />
-        <Picker.Item label="Endocrinologia" value="endocrinologia" />
-        <Picker.Item label="Hematologia" value="hematologia" />
-        <Picker.Item label="Oncologia" value="oncologia" />
-        <Picker.Item label="Infectologia" value="infectologia" />
-        <Picker.Item label="Reumatologia" value="reumatologia" />
-        <Picker.Item label="Gastroenterologia" value="gastroenterologia" />
-        <Picker.Item label="Nefrologia" value="nefrologia" />
-        <Picker.Item label="Anestesiologia" value="anestesiologia" />
-        <Picker.Item label="Cirurgia Geral" value="cirurgia-geral" />
-        <Picker.Item label="Medicina do Trabalho" value="medicina-do-trabalho" />
-        <Picker.Item label="Clínica Geral" value="clinica-geral" />
+        {/* Adicione outras especializações aqui */}
       </Picker>
 
       <Text style={styles.label}>Gênero:</Text>
@@ -106,9 +89,7 @@ export default function Doctors() {
         <Picker.Item label="Selecione" value="" />
         <Picker.Item label="Mulher" value="mulher" />
         <Picker.Item label="Homem" value="homem" />
-        <Picker.Item label="Trans" value="trans" />
-        <Picker.Item label="Não-binário" value="nao-binario" />
-        <Picker.Item label="Outro" value="outro" />
+        {/* Adicione outras opções de gênero aqui */}
       </Picker>
 
       <FlatList

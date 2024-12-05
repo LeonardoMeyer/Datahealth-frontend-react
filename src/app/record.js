@@ -1,15 +1,14 @@
 import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { useLoginStore } from '../stores/useLoginStore';
+import { useEffect } from 'react';
+import { useRecordStore } from '../stores/useRecordStore';
 import { fetchAuth } from '../utils/fetchAuth';
 
 export default function Records() {
   const router = useRouter();
-  const [records, setRecords] = useState([]);
-  const accessToken = useLoginStore.getState().accessToken;
-
+  const { records, setRecords, deleteRecord, updateRecord } = useRecordStore();
+  
   const fetchRecords = async () => {
     try {
       const response = await fetchAuth('http://localhost:3000/record/list', {
@@ -43,8 +42,8 @@ export default function Records() {
 
       if (!response.ok) throw new Error('Erro ao atualizar registro');
       const data = await response.json();
+      updateRecord(data);
       Alert.alert('Sucesso', 'Registro atualizado com sucesso');
-      fetchRecords();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -57,8 +56,8 @@ export default function Records() {
       });
 
       if (!response.ok) throw new Error('Erro ao excluir registro');
+      deleteRecord(id);
       Alert.alert('Sucesso', 'Registro excluído com sucesso');
-      fetchRecords();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }

@@ -3,7 +3,7 @@ import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useLoginStore } from '../stores/useLoginStore';
-import { fetchAuth } from '../utils/fetchAuth';
+import { fetchAuth } from '../utils/fetchAuth'; 
 
 export default function Medications() {
   const router = useRouter();
@@ -12,12 +12,39 @@ export default function Medications() {
 
   const fetchMedications = async () => {
     try {
-      const response = await fetchAuth('http://localhost:3000/medication/list', {
-        method: 'GET',
+      const response = await fetchAuth('http://localhost:3000/medication/list', { 
+        method: 'GET', 
       });
       if (!response.ok) throw new Error('Erro ao buscar registros');
       const data = await response.json();
       setMedications(data.medications);
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+  };
+
+  const handleCreateMedication = async () => {
+    const newMedication = {
+      id: Date.now(), 
+      medicine: 'Relatório Atualizado',
+      image: 'http://example.com/exam-updated.jpg',
+      description: 'Receita médica atualizada',
+      period: '7',
+    };
+
+    try {
+      const response = await fetchAuth('http://localhost:3000/medication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMedication),
+      });
+
+      if (!response.ok) throw new Error('Erro ao criar registro');
+      const data = await response.json();
+      Alert.alert('Sucesso', 'Registro criado com sucesso');
+      fetchMedications(); 
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -44,7 +71,7 @@ export default function Medications() {
       if (!response.ok) throw new Error('Erro ao atualizar registro');
       const data = await response.json();
       Alert.alert('Sucesso', 'Registro atualizado com sucesso');
-      fetchMedications();
+      fetchMedications(); 
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -58,14 +85,14 @@ export default function Medications() {
 
       if (!response.ok) throw new Error('Erro ao excluir registro');
       Alert.alert('Sucesso', 'Registro excluído com sucesso');
-      fetchMedications();
+      fetchMedications(); 
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
   useEffect(() => {
-    fetchMedications();
+    fetchMedications(); 
   }, []);
 
   const renderMedication = ({ item }) => (
@@ -94,7 +121,7 @@ export default function Medications() {
           <Text style={styles.emptyMessage}>Nenhum registro encontrado.</Text>
         )}
       />
-      <Button onPress={() => router.push('/create-medicine')} style={styles.addButton}>
+      <Button onPress={handleCreateMedication} style={styles.addButton}>
         + Adicionar Novo Registro
       </Button>
     </View>

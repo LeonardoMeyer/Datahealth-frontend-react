@@ -12,6 +12,7 @@ export default function CreateDoctor({ navigation }) {
     specialization: '',
     avatar: '', 
   });
+  const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
     if (!form.name || !form.email || !form.specialization || !form.age || !form.gender) {
@@ -24,6 +25,8 @@ export default function CreateDoctor({ navigation }) {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
+    setLoading(true);
+
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
@@ -33,7 +36,7 @@ export default function CreateDoctor({ navigation }) {
       avatar: form.avatar.trim() || null,
     };
 
-    console.log('Payload enviado:', JSON.stringify(payload, null, 2)); 
+    console.log('Payload enviado:', JSON.stringify(payload, null, 2));
 
     try {
       const response = await fetch('http://localhost:3000/doctor', {
@@ -43,18 +46,19 @@ export default function CreateDoctor({ navigation }) {
       });
 
       const responseData = await response.json();
-      console.log('Resposta do servidor:', responseData); 
+      console.log('Resposta do servidor:', responseData);
 
       if (!response.ok) {
         throw new Error(responseData.message || 'Erro ao cadastrar médico.');
       }
 
-      // Caso tenha sucesso
       Alert.alert('Sucesso', 'Médico cadastrado com sucesso!');
+      setLoading(false);
       navigation.goBack();
     } catch (error) {
       console.error('Erro no envio:', error);
       Alert.alert('Erro', error.message);
+      setLoading(false);
     }
   };
 
@@ -125,7 +129,9 @@ export default function CreateDoctor({ navigation }) {
         placeholder="Digite o URL do avatar"
       />
 
-      <Button onPress={handleSubmit}>Cadastrar</Button>
+      <Button onPress={handleSubmit}>
+        {loading ? 'Cadastrando...' : 'Cadastrar'}
+      </Button>
     </View>
   );
 }
