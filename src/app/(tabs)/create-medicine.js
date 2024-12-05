@@ -1,62 +1,100 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { fetchAuth } from '../../utils/fetchAuth';
 
 export default function CreateMedication() {
-  const [medicine, setMedicine] = useState('');
-  const [description, setDescription] = useState('');
-  const [imageUri, setImageUri] = useState(null);
-  const [period, setPeriod] = useState('');
-  const [date, setDate] = useState('');
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [form, setForm] = useState({
+    medicine: '',
+    description: '',
+    image: null,
+    period: '',
+    date: ''
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    requestImagePermission();
+  }, []);
+
+  const requestImagePermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar suas imagens.');
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleImagePicker = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      aspect: [4, 4],
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setImageUri(result.uri);
+    if (!result.canceled && result.assets.length > 0) {
+      const { uri } = result.assets[0];
+      handleInputChange('image', uri);
     }
   };
 
-  const handleCreateMedication = async () => {
-    if (!medicine || !description || !imageUri || !period) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
-      return;
-    }
-
-    setLoading(true);
-
+  const buildFormData = () => {
     const formData = new FormData();
-    formData.append('medicine', medicine);
-    formData.append('description', description);
-    formData.append('period', period);
-    if (date) {
-      formData.append('date', date);
-    }
 
-    const uriParts = imageUri.split('.');
-    const fileType = uriParts[uriParts.length - 1];
-    formData.append('image', {
-      uri: imageUri,
-      name: `image.${fileType}`,
-      type: `image/${fileType}`,
+    Object.entries(form).forEach(([key, value]) => {
+      if (value !== null && value !== '') {
+        if (key === 'image' && value) {
+          const fileName = value.split('/').pop();
+          const match = /\.(\w+)$/.exec(fileName);
+          const fileType = match ? `image/${match[1]}` : 'image';
+
+          formData.append('image', {
+            uri: value,
+            name: fileName,
+            type: fileType,
+          });
+        } else {
+          formData.append(key, value);
+        }
+      }
     });
 
+    return formData;
+  };
+
+  const validateForm = () => {
+    const requiredFields = ['medicine', 'description', 'image', 'period'];
+    for (const field of requiredFields) {
+      if (!form[field]) {
+        Alert.alert('Erro', `Por favor, preencha o campo: ${field.replace(/([A-Z])/g, ' $1').trim()}`);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleCreateMedication = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/medication', {
+      const response = await fetchAuth('http://localhost:3000/medication', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: buildFormData(),
       });
 
       if (response.ok) {
-        const data = await response.json();
+        await response.json();
         Alert.alert('Sucesso', 'Medicação cadastrada com sucesso!');
-        router.replace('/medications'); 
+        router.replace('/medications');
       } else {
         throw new Error('Erro ao cadastrar medicação');
       }
@@ -74,40 +112,42 @@ export default function CreateMedication() {
       <TextInput
         style={styles.input}
         placeholder="Nome do Medicamento"
-        value={medicine}
-        onChangeText={setMedicine}
+        value={form.medicine}
+        onChangeText={(text) => handleInputChange('medicine', text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Descrição"
-        value={description}
-        onChangeText={setDescription}
+        value={form.description}
+        onChangeText={(text) => handleInputChange('description', text)}
       />
       <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
         <Text style={styles.buttonText}>Escolher Imagem</Text>
       </TouchableOpacity>
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+      {form.image && <Image source={{ uri: form.image }} style={styles.imagePreview} />}
       <TextInput
         style={styles.input}
         placeholder="Período (em dias)"
         keyboardType="numeric"
-        value={period}
-        onChangeText={setPeriod}
+        value={form.period}
+        onChangeText={(text) => handleInputChange('period', text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Data (YYYY-MM-DD)"
-        value={date}
-        onChangeText={setDate}
+        value={form.date}
+        onChangeText={(text) => handleInputChange('date', text)}
       />
       <TouchableOpacity
         style={[styles.submitButton, { opacity: loading ? 0.5 : 1 }]}
         onPress={handleCreateMedication}
         disabled={loading}
       >
-        <Text style={styles.submitButtonText}>
-          {loading ? 'Cadastrando...' : 'Cadastrar'}
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.submitButtonText}>Cadastrar</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -148,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   submitButton: {
-    backgroundColor: '#27B9ABB',
+    backgroundColor: 'rgb(123, 154, 187)',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
