@@ -6,6 +6,7 @@ export default function DoctorList({ navigation }) {
   const [doctors, setDoctors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch doctors list
   const fetchDoctors = async () => {
     try {
       const response = await fetch('http://localhost:3000/doctors');
@@ -13,22 +14,37 @@ export default function DoctorList({ navigation }) {
       const data = await response.json();
       setDoctors(data);
     } catch (error) {
-      console.error(error);
+      Alert.alert('Erro', error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Delete doctor
   const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:3000/doctors/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Erro ao deletar médico.');
-      setDoctors(doctors.filter((doctor) => doctor.id !== id));
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
+    Alert.alert(
+      'Confirmar exclusão',
+      'Tem certeza que deseja deletar este médico?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Deletar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const response = await fetch(`http://localhost:3000/doctors/${id}`, {
+                method: 'DELETE',
+              });
+              if (!response.ok) throw new Error('Erro ao deletar médico.');
+              setDoctors(doctors.filter((doctor) => doctor.id !== id));
+              Alert.alert('Sucesso', 'Médico deletado com sucesso.');
+            } catch (error) {
+              Alert.alert('Erro', error.message);
+            }
+          },
+        },
+      ]
+    );
   };
 
   useEffect(() => {
@@ -37,10 +53,15 @@ export default function DoctorList({ navigation }) {
 
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
+      {/* Nome do Médico */}
       <Text style={styles.name}>{item.name}</Text>
-      <Text>Email: {item.email}</Text>
-      <Text>Idade: {item.age}</Text>
-      <Text>Especialização: {item.specialization}</Text>
+
+      {/* Dados adicionais */}
+      <Text style={styles.details}>Email: {item.email}</Text>
+      <Text style={styles.details}>Idade: {item.age}</Text>
+      <Text style={styles.details}>Especialização: {item.specialization}</Text>
+
+      {/* Ações: Editar e Deletar */}
       <View style={styles.actions}>
         <Button onPress={() => navigation.navigate('UpdateDoctor', { id: item.id })}>
           Editar
@@ -57,15 +78,19 @@ export default function DoctorList({ navigation }) {
 
   return (
     <View style={styles.container}>
- <Button onPress={() => router.push('/CreateDoctor')} style={styles.signupButton}>
-          Cadastre-se
-        </Button>      {isLoading ? (
-        <Text>Carregando...</Text>
+      <Button onPress={() => navigation.navigate('CreateDoctor')} style={styles.addButton}>
+        Cadastrar Médico
+      </Button>
+      {isLoading ? (
+        <Text style={styles.loadingText}>Carregando...</Text>
       ) : (
         <FlatList
           data={doctors}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderDoctor}
+          ListEmptyComponent={() => (
+            <Text style={styles.emptyText}>Nenhum médico encontrado.</Text>
+          )}
         />
       )}
     </View>
@@ -76,6 +101,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     flex: 1,
+    backgroundColor: '#f0f4f8',
   },
   card: {
     padding: 15,
@@ -83,11 +109,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#333',
+  },
+  details: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 5,
   },
   actions: {
     flexDirection: 'row',
@@ -101,5 +134,25 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: 'white',
+    fontWeight: 'bold',
+  },
+  addButton: {
+    marginBottom: 20,
+    backgroundColor: '#4caf50',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
+  loadingText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#666',
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#666',
+    marginTop: 20,
   },
 });

@@ -1,4 +1,5 @@
 import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -6,6 +7,8 @@ import { useEffect, useState } from 'react';
 export default function Doctors() {
   const router = useRouter();
   const [doctors, setDoctors] = useState([]);
+  const [specialization, setSpecialization] = useState('');
+  const [gender, setGender] = useState('');
 
   const fetchDoctors = async () => {
     try {
@@ -36,7 +39,7 @@ export default function Doctors() {
   };
 
   const handleAdd = () => {
-    router.push('/add-doctor');
+    router.push('/create-doctor');
   };
 
   useEffect(() => {
@@ -46,7 +49,8 @@ export default function Doctors() {
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.name}</Text>
-      <Text style={styles.specialty}>{item.specialization}</Text>
+      <Text style={styles.specialty}>Especialização: {item.specialization}</Text>
+      <Text style={styles.specialty}>Gênero: {item.gender}</Text>
       <View style={styles.buttonGroup}>
         <Button onPress={() => handleUpdate(item.id)} style={styles.updateButton}>
           Atualizar
@@ -61,16 +65,67 @@ export default function Doctors() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Lista de Médicos</Text>
+
+      {/* Filtros */}
+      <Text style={styles.label}>Especialização:</Text>
+      <Picker
+        selectedValue={specialization}
+        onValueChange={(value) => setSpecialization(value)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Selecione" value="" />
+        <Picker.Item label="Cardiologia" value="cardiologia" />
+        <Picker.Item label="Pediatria" value="pediatria" />
+        <Picker.Item label="Dermatologia" value="dermatologia" />
+        <Picker.Item label="Ortopedia" value="ortopedia" />
+        <Picker.Item label="Neurologia" value="neurologia" />
+        <Picker.Item label="Psiquiatria" value="psiquiatria" />
+        <Picker.Item label="Ginecologia" value="ginecologia" />
+        <Picker.Item label="Urologia" value="urologia" />
+        <Picker.Item label="Oftalmologia" value="oftalmologia" />
+        <Picker.Item label="Otorrinolaringologia" value="otorrinolaringologia" />
+        <Picker.Item label="Endocrinologia" value="endocrinologia" />
+        <Picker.Item label="Hematologia" value="hematologia" />
+        <Picker.Item label="Oncologia" value="oncologia" />
+        <Picker.Item label="Infectologia" value="infectologia" />
+        <Picker.Item label="Reumatologia" value="reumatologia" />
+        <Picker.Item label="Gastroenterologia" value="gastroenterologia" />
+        <Picker.Item label="Nefrologia" value="nefrologia" />
+        <Picker.Item label="Anestesiologia" value="anestesiologia" />
+        <Picker.Item label="Cirurgia Geral" value="cirurgia-geral" />
+        <Picker.Item label="Medicina do Trabalho" value="medicina-do-trabalho" />
+        <Picker.Item label="Clínica Geral" value="clinica-geral" />
+      </Picker>
+
+      <Text style={styles.label}>Gênero:</Text>
+      <Picker
+        selectedValue={gender}
+        onValueChange={(value) => setGender(value)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Selecione" value="" />
+        <Picker.Item label="Mulher" value="mulher" />
+        <Picker.Item label="Homem" value="homem" />
+        <Picker.Item label="Trans" value="trans" />
+        <Picker.Item label="Não-binário" value="nao-binario" />
+        <Picker.Item label="Outro" value="outro" />
+      </Picker>
+
       <FlatList
-        data={doctors}
+        data={doctors.filter(
+          (doctor) =>
+            (!specialization || doctor.specialization === specialization) &&
+            (!gender || doctor.gender === gender)
+        )}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderDoctor}
         ListEmptyComponent={() => (
           <Text style={styles.emptyMessage}>Nenhum médico encontrado.</Text>
         )}
       />
-               <Button onPress={() => router.push('/create-doctor')}>Criar medico</Button>
-
+      <Button onPress={handleAdd} style={styles.addButton}>
+        Criar Médico
+      </Button>
     </View>
   );
 }
@@ -86,6 +141,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#7B9ABB',
     marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    color: '#444',
+  },
+  picker: {
+    backgroundColor: '#FFF',
+    borderRadius: 5,
+    marginBottom: 15,
+    padding: 10,
   },
   card: {
     backgroundColor: '#FFFFFF',
