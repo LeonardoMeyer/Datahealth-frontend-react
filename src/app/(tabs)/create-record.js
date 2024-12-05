@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, TextInput, Alert, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import Button from '../../Views/components/Button';
 import { useRecordStore } from '../../stores/useRecordStore';
-import { fetchAuth } from '../../utils/fetchAuth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CreateAccount() {
   const { addRecord } = useRecordStore();
@@ -14,32 +13,32 @@ export default function CreateAccount() {
   const [txtRecipe, setTxtRecipe] = useState('');
   const [txtDate, setTxtDate] = useState('');
   const [imageUri, setImageUri] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const checkPermissions = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão de acesso à galeria', 'Precisamos da sua permissão para acessar a galeria de fotos.');
-    }
-  };
-
-  useEffect(() => {
-    checkPermissions();
-  }, []);
-
-  const pickImage = async () => {
+  const handleImagePicker = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaType: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setImageUri(result.uri); 
+    if (!result.canceled) {
+      setImageUri(result.uri);
     }
   };
 
   const handleCreateRecord = async () => {
-    if (!txtReport || !imageUri || !txtRecipe || !txtDate) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+    setLoading(true);
+    const id = await AsyncStorage.getItem('id');
+
+    if (!id) {
+      Alert.alert('Erro', 'Usuário não encontrado. Por favor, faça login novamente.');
+      setLoading(false);
+      return;
+    }
+
+    if (!txtReport || !txtDate || !imageUri) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      setLoading(false);
       return;
     }
 
@@ -47,6 +46,7 @@ export default function CreateAccount() {
     formData.append('report', txtReport);
     formData.append('recipe', txtRecipe);
     formData.append('date', txtDate);
+    formData.append('user_id', id);
 
     const uriParts = imageUri.split('.');
     const fileType = uriParts[uriParts.length - 1];
@@ -58,79 +58,122 @@ export default function CreateAccount() {
     });
 
     try {
-      const response = await fetchAuth('http://localhost:3000/record', {
+      const response = await fetch('http://localhost:3000/record', {
         method: 'POST',
-        body: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        body: formData,
       });
 
       if (response.ok) {
         const data = await response.json();
         addRecord(data.record);
         router.replace('/home');
+        Alert.alert('Sucesso', 'Relatório cadastrado com sucesso!');
       } else {
-        console.log('Erro ao carregar records');
+        const errorData = await response.json();
+        console.error('Erro ao criar record:', errorData);
+        Alert.alert('Erro', 'Falha ao cadastrar o relatório. Tente novamente.');
       }
     } catch (error) {
-      console.log('Erro ao enviar dados:', error);
+      console.error('Erro ao enviar dados:', error);
+      Alert.alert('Erro', 'Ocorreu um erro inesperado. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text>Relatório:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setTxtReport}
-        value={txtReport}
-        placeholder="Digite o nome do relatório..."
-        placeholderTextColor="#DDDDDD"
-      />
-      <Text>Exame (Imagem):</Text>
-      <Button onPress={pickImage}>Escolher Imagem do Exame</Button>
-      {imageUri && (
-        <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-      )}
-      <Text>Receita:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setTxtRecipe}
-        value={txtRecipe}
-        placeholder="Digite o nome da receita..."
-        placeholderTextColor="#DDDDDD"
-      />
-      <Text>Data:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setTxtDate}
-        value={txtDate}
-        placeholder="Digite a data (YYYY-MM-DD)..."
-        placeholderTextColor="#DDDDDD"
-      />
-      <Button onPress={handleCreateRecord}>Cadastrar</Button>
+      <ScrollView style={styles.formContainer}>
+        <Text style={styles.sectionTitle}>Cadastrar Relatório</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome do Relatório"
+          onChangeText={setTxtReport}
+          value={txtReport}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Nome da Receita"
+          onChangeText={setTxtRecipe}
+          value={txtRecipe}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Data (YYYY-MM-DD)"
+          onChangeText={setTxtDate}
+          value={txtDate}
+        />
+        <TouchableOpacity style={styles.imageButton} onPress={handleImagePicker}>
+          <Text style={styles.imageButtonText}>Escolher Imagem do Exame</Text>
+        </TouchableOpacity>
+        {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+        <TouchableOpacity
+          style={[styles.confirmButton, { opacity: loading ? 0.5 : 1 }]}
+          onPress={handleCreateRecord}
+          disabled={loading}
+        >
+          <Text style={styles.confirmButtonText}>
+            {loading ? 'Carregando...' : 'Cadastrar'}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: '#fff',
     padding: 20,
   },
+  formContainer: {
+    flex: 1,
+  },
   input: {
+    height: 40,
+    borderColor: '#000',
     borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#444444',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginVertical: 5,
     borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#7B9ABB',
+    marginBottom: 10,
+  },
+  imageButton: {
+    backgroundColor: '#7B9ABB',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  imageButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   imagePreview: {
-    width: 100,
-    height: 100,
+    width: '100%',
+    height: 200,
     marginVertical: 10,
+    borderRadius: 10,
+  },
+  confirmButton: {
+    backgroundColor: '#7B9ABB',
+    padding: 15,
     borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

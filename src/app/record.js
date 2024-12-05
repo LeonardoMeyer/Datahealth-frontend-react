@@ -12,35 +12,12 @@ export default function Records() {
 
   const fetchRecords = async () => {
     try {
-      const response = await fetchAuth('http://localhost:3000/record/list', { 
+      const response = await fetchAuth('http://localhost:3000/record/list', {
         method: 'GET',
       });
       if (!response.ok) throw new Error('Erro ao buscar registros');
       const data = await response.json();
       setRecords(data.records);
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
-  };
-
-  const handleCreateRecord = async () => {
-    const newRecord = {
-      report: 'Novo Relatório',
-      exam: 'http://example.com/exam.jpg',
-      recipe: 'Receita médica',
-      date: '2024-12-03',
-    };
-
-    try {
-      const response = await fetchAuth('http://localhost:3000/record', {
-        method: 'POST',
-        body: JSON.stringify(newRecord),
-      });
-
-      if (!response.ok) throw new Error('Erro ao criar registro');
-      const data = await response.json();
-      Alert.alert('Sucesso', 'Registro criado com sucesso');
-      fetchRecords();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -58,13 +35,16 @@ export default function Records() {
     try {
       const response = await fetchAuth(`http://localhost:3000/record/${id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(updatedRecord),
       });
 
       if (!response.ok) throw new Error('Erro ao atualizar registro');
       const data = await response.json();
       Alert.alert('Sucesso', 'Registro atualizado com sucesso');
-      fetchRecords(); 
+      fetchRecords();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -78,17 +58,16 @@ export default function Records() {
 
       if (!response.ok) throw new Error('Erro ao excluir registro');
       Alert.alert('Sucesso', 'Registro excluído com sucesso');
-      fetchRecords(); 
+      fetchRecords();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
   useEffect(() => {
-    fetchRecords(); 
+    fetchRecords();
   }, []);
 
-  
   const renderRecord = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.report}</Text>
@@ -115,7 +94,7 @@ export default function Records() {
           <Text style={styles.emptyMessage}>Nenhum registro encontrado.</Text>
         )}
       />
-      <Button onPress={handleCreateRecord} style={styles.addButton}>
+      <Button onPress={() => router.push('/create-record')} style={styles.addButton}>
         + Adicionar Novo Registro
       </Button>
     </View>
