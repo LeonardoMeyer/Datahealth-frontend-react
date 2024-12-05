@@ -1,11 +1,13 @@
-import { FlatList, StyleSheet, View, Text, Alert, TextInput } from 'react-native'; 
+import React, { useState, useEffect } from 'react';
+import { FlatList, StyleSheet, View, Text, Alert, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useDoctorStore } from '../stores/useDoctorStore';  // Importando o Zustand store
 
 export default function Doctors() {
-  const [doctors, setDoctors] = useState([]);
+  const router = useRouter();
+  const { doctors, setDoctors, deleteDoctor } = useDoctorStore();  // Acesso ao Zustand store
   const [specialization, setSpecialization] = useState('');
   const [gender, setGender] = useState('');
   const [editingDoctor, setEditingDoctor] = useState(null); 
@@ -26,9 +28,9 @@ export default function Doctors() {
     "Psicologia",
     "Endocrinologia",
     "Ginecologia",
-
   ];
 
+  // Lista de gêneros adicionais
   const genderList = [
     "Mulher",
     "Homem",
@@ -37,18 +39,19 @@ export default function Doctors() {
     "Outro",
   ];
 
-
+  // Função para buscar médicos e atualizar o store Zustand
   const fetchDoctors = async () => {
     try {
       const response = await fetch('http://localhost:3000/doctor/list');
       if (!response.ok) throw new Error('Erro ao buscar médicos');
       const data = await response.json();
-      setDoctors(data.doctors);
+      setDoctors(data.doctors);  // Atualizando o estado global com o Zustand
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
+  // Função para editar um médico
   const handleEdit = (doctor) => {
     setEditingDoctor(doctor.id); 
     setDoctorData({
@@ -58,6 +61,7 @@ export default function Doctors() {
     });
   };
 
+  // Função para atualizar um médico
   const handleUpdate = async () => {
     try {
       const response = await fetch(`http://localhost:3000/doctor/${editingDoctor}`, {
@@ -68,13 +72,14 @@ export default function Doctors() {
 
       if (!response.ok) throw new Error('Erro ao atualizar médico');
       Alert.alert('Sucesso', 'Médico atualizado com sucesso');
-      setEditingDoctor(null);
-      fetchDoctors(); 
+      setEditingDoctor(null); 
+      fetchDoctors();  // Recarrega a lista de médicos após a atualização
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
+  // Função para excluir um médico
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/doctor/${id}`, {
@@ -82,16 +87,19 @@ export default function Doctors() {
       });
       if (!response.ok) throw new Error('Erro ao excluir médico');
       Alert.alert('Sucesso', 'Médico excluído com sucesso');
-      fetchDoctors();
+      deleteDoctor(id);  // Remover o médico do Zustand store
+      fetchDoctors();  // Atualizar lista de médicos após exclusão
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
+  // Carregar médicos quando a tela for montada
   useEffect(() => {
     fetchDoctors();
   }, []);
 
+  // Função para renderizar cada médico na lista
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.name}</Text>

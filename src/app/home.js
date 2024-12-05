@@ -12,9 +12,7 @@ export default function Home() {
       <Header />
       <View style={styles.content}>
         <View style={styles.buttonContainer}>
-          <Button onPress={() => router.push('/create-record')} style={styles.button}>
-            Novo Registro
-          </Button>
+         
           <Button onPress={() => router.push('/medication')} style={styles.button}>
             Medicação
           </Button>
@@ -42,7 +40,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonContainer: {
-    marginTop: 20,
+    margin: 20,
+    alignItems:'',
     width: '100%',
   },
   button: {
