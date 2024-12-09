@@ -1,14 +1,13 @@
 import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { useLoginStore } from '../stores/useLoginStore';
+import { useEffect } from 'react';
+import { useMedicineStore } from '../stores/useMedicineStore';
 import { fetchAuth } from '../utils/fetchAuth';
 
 export default function Medications() {
   const router = useRouter();
-  const [medications, setMedications] = useState([]);
-  const accessToken = useLoginStore.getState().accessToken;
+  const { medications, setMedications, deleteMedication, updateMedication } = useMedicineStore();
 
   const fetchMedications = async () => {
     try {
@@ -43,8 +42,8 @@ export default function Medications() {
 
       if (!response.ok) throw new Error('Erro ao atualizar registro');
       const data = await response.json();
+      updateMedication(data);
       Alert.alert('Sucesso', 'Registro atualizado com sucesso');
-      fetchMedications();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -57,8 +56,8 @@ export default function Medications() {
       });
 
       if (!response.ok) throw new Error('Erro ao excluir registro');
+      deleteMedication(id);
       Alert.alert('Sucesso', 'Registro excluído com sucesso');
-      fetchMedications();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -70,8 +69,8 @@ export default function Medications() {
 
   const renderMedication = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.doctorName}>{item.report}</Text>
-      <Text style={styles.specialty}>{item.date}</Text>
+      <Text style={styles.doctorName}>{item.medicine}</Text>
+      <Text style={styles.specialty}>{item.description}</Text>
       <View style={styles.buttonGroup}>
         <Button onPress={() => handleUpdateMedication(item.id)} style={styles.updateButton}>
           Atualizar
@@ -85,17 +84,17 @@ export default function Medications() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lista de Registros Médicos</Text>
+      <Text style={styles.title}>Lista de Medicamentos</Text>
       <FlatList
         data={medications}
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderMedication}
         ListEmptyComponent={() => (
-          <Text style={styles.emptyMessage}>Nenhum registro encontrado.</Text>
+          <Text style={styles.emptyMessage}>Nenhum medicamento encontrado.</Text>
         )}
       />
       <Button onPress={() => router.push('/create-medicine')} style={styles.addButton}>
-        + Adicionar Novo Registro
+        + Adicionar Novo Medicamento
       </Button>
     </View>
   );
