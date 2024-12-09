@@ -7,6 +7,7 @@ export const useLoginStore = create((set) => ({
     avatar: '',
     email: '',
     profileImage: '', 
+    id: '',
 
     login: (userLogin) => set({ ...userLogin }),
     logout: () => set({
@@ -16,5 +17,7 @@ export const useLoginStore = create((set) => ({
         avatar: '',
         email: '',
         profileImage: '',
+        id: '',
+
     }),
 }));
