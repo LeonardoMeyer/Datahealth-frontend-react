@@ -1,200 +1,100 @@
-import { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
-import { fetchAuth } from '../../utils/fetchAuth';
+import React, { useState } from 'react';
+import { View, TextInput, Button, Text, Image, Alert } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { fetchAuth } from '../../utils/fetchAuth'; 
 
-export default function CreateMedication() {
-  const router = useRouter();
-  const [form, setForm] = useState({
-    medicine: '',
-    description: '',
-    image: null,
-    period: '',
-    date: ''
-  });
-  const [loading, setLoading] = useState(false);
+const CreateMedication = () => {
+  const [medicine, setMedicine] = useState('');
+  const [description, setDescription] = useState('');
+  const [userId, setUserId] = useState('');
+  const [period, setPeriod] = useState('');
+  const [imageUri, setImageUri] = useState(null);
 
-  useEffect(() => {
-    requestImagePermission();
-  }, []);
-
-  const requestImagePermission = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar suas imagens.');
-    }
-  };
-
-  const handleInputChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleImagePicker = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      aspect: [4, 4],
-      quality: 1,
+  const pickImage = () => {
+    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+      if (response.didCancel) {
+        console.log('Imagem não selecionada');
+      } else if (response.errorCode) {
+        console.error(response.errorMessage);
+      } else {
+        setImageUri(response.assets[0].uri);
+      }
     });
-
-    if (!result.canceled && result.assets.length > 0) {
-      const { uri } = result.assets[0];
-      handleInputChange('image', uri);
-    }
   };
 
-  const buildFormData = () => {
+  const handleSubmit = async () => {
+    if (!medicine || !description || !period || !imageUri) {
+      Alert.alert('Erro', 'Todos os campos são obrigatórios');
+      return;
+    }
+
     const formData = new FormData();
-
-    Object.entries(form).forEach(([key, value]) => {
-      if (value !== null && value !== '') {
-        if (key === 'image' && value) {
-          const fileName = value.split('/').pop();
-          const match = /\.(\w+)$/.exec(fileName);
-          const fileType = match ? `image/${match[1]}` : 'image';
-
-          formData.append('image', {
-            uri: value,
-            name: fileName,
-            type: fileType,
-          });
-        } else {
-          formData.append(key, value);
-        }
-      }
+    formData.append('medicine', medicine);
+    formData.append('description', description);
+    formData.append('period', period);
+    formData.append('image', {
+      uri: imageUri,
+      type: 'image/jpeg',
+      name: `image_${Date.now()}.jpg`,
     });
 
-    return formData;
-  };
-
-  const validateForm = () => {
-    const requiredFields = ['medicine', 'description', 'image', 'period'];
-    for (const field of requiredFields) {
-      if (!form[field]) {
-        Alert.alert('Erro', `Por favor, preencha o campo: ${field.replace(/([A-Z])/g, ' $1').trim()}`);
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const handleCreateMedication = async () => {
-    if (!validateForm()) return;
-
-    setLoading(true);
     try {
       const response = await fetchAuth('http://localhost:3000/medication', {
         method: 'POST',
+        body: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        body: buildFormData(),
       });
 
       if (response.ok) {
-        await response.json();
-        Alert.alert('Sucesso', 'Medicação cadastrada com sucesso!');
-        router.replace('/medications');
+        const data = await response.json();
+        Alert.alert('Sucesso', 'Medicamento criado com sucesso');
+        console.log(data);
       } else {
-        throw new Error('Erro ao cadastrar medicação');
+        const errorData = await response.json();
+        Alert.alert('Erro', errorData.error || 'Erro ao criar medicamento');
       }
     } catch (error) {
-      console.error('Erro:', error);
-      Alert.alert('Erro', 'Ocorreu um erro. Tente novamente.');
-    } finally {
-      setLoading(false);
+      console.error(error);
+      Alert.alert('Erro', 'Erro ao conectar com o servidor');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastrar Medicação</Text>
+    <View style={{ padding: 20 }}>
       <TextInput
-        style={styles.input}
-        placeholder="Nome do Medicamento"
-        value={form.medicine}
-        onChangeText={(text) => handleInputChange('medicine', text)}
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        placeholder="Nome do medicamento"
+        value={medicine}
+        onChangeText={setMedicine}
       />
       <TextInput
-        style={styles.input}
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
         placeholder="Descrição"
-        value={form.description}
-        onChangeText={(text) => handleInputChange('description', text)}
+        value={description}
+        onChangeText={setDescription}
       />
-      <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
-        <Text style={styles.buttonText}>Escolher Imagem</Text>
-      </TouchableOpacity>
-      {form.image && <Image source={{ uri: form.image }} style={styles.imagePreview} />}
       <TextInput
-        style={styles.input}
-        placeholder="Período (em dias)"
+        style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10 }}
+        placeholder="Período (dias)"
         keyboardType="numeric"
-        value={form.period}
-        onChangeText={(text) => handleInputChange('period', text)}
+        value={period}
+        onChangeText={setPeriod}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Data (YYYY-MM-DD)"
-        value={form.date}
-        onChangeText={(text) => handleInputChange('date', text)}
-      />
-      <TouchableOpacity
-        style={[styles.submitButton, { opacity: loading ? 0.5 : 1 }]}
-        onPress={handleCreateMedication}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.submitButtonText}>Cadastrar</Text>
-        )}
-      </TouchableOpacity>
+
+      {/* Seletor de imagem */}
+      <Button title="Selecionar Imagem" onPress={pickImage} />
+      {imageUri && (
+        <Image
+          source={{ uri: imageUri }}
+          style={{ width: 100, height: 100, marginVertical: 10 }}
+        />
+      )}
+
+      <Button title="Criar Medicamento" onPress={handleSubmit} />
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-  },
-  button: {
-    backgroundColor: '#7B9ABB',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  imagePreview: {
-    width: '100%',
-    height: 200,
-    marginBottom: 15,
-    borderRadius: 10,
-  },
-  submitButton: {
-    backgroundColor: 'rgb(123, 154, 187)',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-});
+export default CreateMedication;
