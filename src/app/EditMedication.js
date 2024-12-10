@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import Button from '../Views/components/Button';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -10,20 +10,32 @@ export default function UpdateMedication() {
   const { id } = useLocalSearchParams();
   const { medications, updateMedication } = useMedicationStore();
 
-  const medication = medications.find((item) => item.id === +id);
+  // Converte o ID para número, validando se é válido
+  const medication = medications.find((item) => item.id === Number(id));
 
   const [txtMedicine, setTxtMedicine] = useState(medication?.medicine || '');
   const [txtDescription, setTxtDescription] = useState(medication?.description || '');
-  const [txtPeriod, setTxtPeriod] = useState(medication?.period.toString() || '');
+  const [txtPeriod, setTxtPeriod] = useState(medication?.period?.toString() || '');
   const [txtImgUrl, setTxtImgUrl] = useState(medication?.image || '');
 
   useEffect(() => {
     if (!medication) {
-      router.push('/medication'); 
+      Alert.alert('Erro', 'Medicamento não encontrado.');
+      router.push('/medication');
     }
   }, [medication]);
 
   const handleUpdateMedication = async () => {
+    if (!txtMedicine || !txtDescription || !txtPeriod) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    if (isNaN(parseInt(txtPeriod, 10)) || parseInt(txtPeriod, 10) <= 0) {
+      Alert.alert('Erro', 'O período deve ser um número positivo.');
+      return;
+    }
+
     const updatedMedication = {
       medicine: txtMedicine,
       description: txtDescription,
@@ -31,19 +43,25 @@ export default function UpdateMedication() {
       image: txtImgUrl,
     };
 
-    const response = await fetchAuth(`http://localhost:3000/medication/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(updatedMedication),
-    });
+    try {
+      const response = await fetchAuth(`http://localhost:3000/medication/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedMedication),
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-    if (response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar medicamento');
+      }
+
       const data = await response.json();
-      updateMedication(data); 
-      router.back(); 
-      return;
+      updateMedication(data);
+      Alert.alert('Sucesso', 'Medicamento atualizado com sucesso!');
+      router.back();
+    } catch (error) {
+      Alert.alert('Erro', error.message);
     }
-
-    console.log('Erro ao atualizar medicamento');
   };
 
   return (
@@ -89,7 +107,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderStyle: 'solid',
     borderColor: '#444444',
     paddingHorizontal: 10,
     paddingVertical: 6,
