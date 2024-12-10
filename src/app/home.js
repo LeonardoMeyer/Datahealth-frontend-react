@@ -11,7 +11,7 @@ export default function Home() {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userLogged');
-      router.replace('/login'); // Redireciona para a tela de login
+      router.replace('/login');
     } catch (error) {
       console.error('Erro ao sair da conta:', error);
       Alert.alert('Erro ao sair da conta.');

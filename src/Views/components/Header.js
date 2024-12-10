@@ -11,26 +11,21 @@ export default function Header() {
 
   const handleProfilePress = () => {
     if (name) {
-      window.location.href = '/update'; // Redireciona para a página de atualização de perfil
+      window.location.href = '/update';
     } else {
-      window.location.href = '/login'; // Redireciona para a página de login
+      window.location.href = '/login';
     }
   };
 
   return (
     <View style={styles.header}>
-      {/* Logo que ao ser pressionada redireciona para a Home */}
       <TouchableOpacity onPress={handleLogoPress}>
         <Image 
           source={require('../../../logo/logo.svg')} 
           style={styles.logo}
         />
       </TouchableOpacity>
-
-      {/* Título "Datahealth" */}
       <Text style={styles.title}>Datahealth</Text>
-
-      {/* Botão de perfil ou login */}
       <TouchableOpacity style={styles.profileContainer} onPress={handleProfilePress}>
         {name ? (
           <>

@@ -54,7 +54,7 @@ export default function SignUp() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Campos de Cadastro */}
+      {/* cadastro */}
       {[ 
         { label: 'Nome', key: 'name', placeholder: 'Digite seu nome...' },
         { label: 'Email', key: 'email', placeholder: 'Digite seu email...', keyboardType: 'email-address' },
@@ -75,7 +75,7 @@ export default function SignUp() {
         </View>
       ))}
 
-      {/* Gênero */}
+      {/* genero */}
       <Text style={styles.label}>Gênero:</Text>
       <Picker
         selectedValue={formData.gender}
@@ -90,7 +90,7 @@ export default function SignUp() {
         <Picker.Item label="Outro" value="outro" />
       </Picker>
 
-      {/* Tipo Sanguíneo */}
+      {/* sangue */}
       <Text style={styles.label}>Tipo Sanguíneo:</Text>
       <Picker
         selectedValue={formData.blood_type}
@@ -108,7 +108,7 @@ export default function SignUp() {
         <Picker.Item label="O-" value="O-" />
       </Picker>
 
-      {/* Etnia */}
+      {/* etnia */}
       <Text style={styles.label}>Etnia:</Text>
       <Picker
         selectedValue={formData.ethnicity}
@@ -124,7 +124,7 @@ export default function SignUp() {
         <Picker.Item label="Outro" value="outro" />
       </Picker>
 
-      {/* Botão de Cadastro */}
+      {/* cadastro */}
       <Button onPress={handleCreateAccount}>
         Cadastrar-se
       </Button>

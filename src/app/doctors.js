@@ -61,25 +61,37 @@ export default function Doctors() {
     });
   };
 
-  // Função para atualizar um médico
-  const handleUpdate = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/doctor/${editingDoctor}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(doctorData),
-      });
-
-      if (!response.ok) throw new Error('Erro ao atualizar médico');
-      Alert.alert('Sucesso', 'Médico atualizado com sucesso');
-      setEditingDoctor(null); 
-      fetchDoctors();  // Recarrega a lista de médicos após a atualização
-    } catch (error) {
-      Alert.alert('Erro', error.message);
+const handleUpdate = async () => {
+  try {
+    if (!doctorData.name || !doctorData.specialization || !doctorData.gender) {
+      Alert.alert('Erro', 'Todos os campos devem ser preenchidos');
+      return;
     }
-  };
+    const url = `http://localhost:3000/doctor/${editingDoctor}`;
 
-  // Função para excluir um médico
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(doctorData), 
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage || 'Erro ao atualizar médico');
+    }
+
+    Alert.alert('Sucesso', 'Médico atualizado com sucesso');
+    setEditingDoctor(null);
+    setDoctorData({ name: '', specialization: '', gender: '' });
+    fetchDoctors();
+  } catch (error) {
+    Alert.alert('Erro', error.message);
+  }
+};
+
+
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/doctor/${id}`, {
@@ -87,19 +99,17 @@ export default function Doctors() {
       });
       if (!response.ok) throw new Error('Erro ao excluir médico');
       Alert.alert('Sucesso', 'Médico excluído com sucesso');
-      deleteDoctor(id);  // Remover o médico do Zustand store
-      fetchDoctors();  // Atualizar lista de médicos após exclusão
+      deleteDoctor(id);  
+      fetchDoctors();  
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
-  // Carregar médicos quando a tela for montada
   useEffect(() => {
     fetchDoctors();
   }, []);
 
-  // Função para renderizar cada médico na lista
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.name}</Text>

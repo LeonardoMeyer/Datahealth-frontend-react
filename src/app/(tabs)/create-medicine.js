@@ -3,13 +3,13 @@ import { useState } from "react"
 import Button from '../../Views/components/Button'
 import { useRouter } from 'expo-router'
 import { useMedicineStore } from '../../stores/useMedicineStore'
-import { useLoginStore } from '../../stores/useLoginStore'  // Importando a store de login
+import { useLoginStore } from '../../stores/useLoginStore'
 import { fetchAuth } from '../../utils/fetchAuth'
 
 export default function CreateMedicine() {
 
     const { addMedicine } = useMedicineStore()
-    const { id: userId } = useLoginStore()  // Obtendo o userId da store de login
+    const { id: userId } = useLoginStore() 
     const router = useRouter()
 
     const [txtName, setTxtName] = useState('')          
@@ -18,7 +18,6 @@ export default function CreateMedicine() {
     const [txtImgUrl, setTxtImgUrl] = useState('')      
 
     const handleCreateMedicine = async () => {
-        // Verificando se o userId existe
         if (!userId) {
             console.log('Erro: Usuário não encontrado');
             return;
@@ -29,7 +28,7 @@ export default function CreateMedicine() {
             description: txtDescription,
             period: txtPeriod,
             image_url: txtImgUrl,
-            user_id: userId  // Adicionando o user_id ao payload
+            user_id: userId 
         }
 
         const response = await fetchAuth('http://localhost:3000/medication', {
