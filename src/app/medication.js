@@ -51,12 +51,13 @@ export default function Medications() {
         )}
         <Text style={styles.period}>Período: {item.period} dias</Text>
         <View style={styles.buttonGroup}>
-          <Button
-            onPress={() => router.push(`/EditMedication`)} 
-            style={styles.updateButton}
-          >
-            Atualizar
-          </Button>
+        <Button
+  onPress={() => router.push(`/EditMedication?id=${item.id}`)}
+  style={styles.updateButton}
+>
+  Atualizar
+</Button>
+
           <Button onPress={() => handleDeleteMedication(item.id)} style={styles.deleteButton}>
             Excluir
           </Button>
