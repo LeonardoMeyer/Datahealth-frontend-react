@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../../Views/components/Button';
 import { useRouter } from 'expo-router';
@@ -11,6 +11,7 @@ export default function Profile() {
     name: '',
     email: '',
     password: '',
+    avatar: '', // Campo para armazenar a URL da foto
   });
 
   useEffect(() => {
@@ -29,9 +30,9 @@ export default function Profile() {
   }, []);
 
   const handleSave = async () => {
-    const { name, email, password } = profileData;
+    const { name, email, password, avatar } = profileData;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !avatar) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
@@ -48,7 +49,7 @@ export default function Profile() {
   const handleDelete = async () => {
     try {
       await AsyncStorage.removeItem('@profile');
-      setProfileData({ name: '', email: '', password: '' });
+      setProfileData({ name: '', email: '', password: '', avatar: '' });
       Alert.alert('Sucesso', 'Perfil excluído com sucesso!');
       router.replace('/login');
     } catch (error) {
@@ -74,6 +75,21 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Meu Perfil</Text>
+
+      {/* Exibição da Foto */}
+      {profileData.avatar ? (
+        <Image source={{ uri: profileData.avatar }} style={styles.avatar} />
+      ) : (
+        <Text style={styles.placeholder}>Sem foto</Text>
+      )}
+
+      <Text style={styles.label}>URL da Foto:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Digite a URL da foto"
+        value={profileData.avatar}
+        onChangeText={(value) => handleChange('avatar', value)}
+      />
 
       <Text style={styles.label}>Nome:</Text>
       <TextInput
@@ -167,5 +183,19 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  placeholder: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    color: '#AAA',
+    textAlign: 'center',
+    marginBottom: 20,
   },
 });

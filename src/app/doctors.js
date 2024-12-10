@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, View, Text, Alert, TextInput } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Alert, TextInput, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useDoctorStore } from '../stores/useDoctorStore';  // Importando o Zustand store
+import { useDoctorStore } from '../stores/useDoctorStore'; // Importando o Zustand store
 
 export default function Doctors() {
   const router = useRouter();
-  const { doctors, setDoctors, deleteDoctor } = useDoctorStore();  // Acesso ao Zustand store
+  const { doctors, setDoctors, deleteDoctor } = useDoctorStore(); // Acesso ao Zustand store
   const [specialization, setSpecialization] = useState('');
   const [gender, setGender] = useState('');
-  const [editingDoctor, setEditingDoctor] = useState(null); 
+  const [editingDoctor, setEditingDoctor] = useState(null);
   const [doctorData, setDoctorData] = useState({
     name: '',
     specialization: '',
     gender: '',
+    email: '',
+    age: '',
+    avatar: '', // Adicionado para a URL da imagem
   });
 
-  // Lista de especializações adicionais
   const specializationsList = [
     "Cardiologia",
     "Pediatria",
@@ -30,36 +32,30 @@ export default function Doctors() {
     "Ginecologia",
   ];
 
-  const genderList = [
-    "Mulher",
-    "Homem",
-    "Trans",
-    "Não-binário",
-    "Outro",
-  ];
+  const genderList = ["Mulher", "Homem", "Trans", "Não-binário", "Outro"];
 
   const fetchDoctors = async () => {
     try {
       const response = await fetch('http://localhost:3000/doctor/list');
       if (!response.ok) throw new Error('Erro ao buscar médicos');
       const data = await response.json();
-      setDoctors(data.doctors); 
+      setDoctors(data.doctors);
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
   const handleEdit = (doctor) => {
-    setEditingDoctor(doctor.id); 
+    setEditingDoctor(doctor.id);
     setDoctorData({
       name: doctor.name,
       specialization: doctor.specialization,
       gender: doctor.gender,
       email: doctor.email,
-      age: doctor.age,    
+      age: doctor.age,
+      avatar: doctor.avatar, // Adicionado para editar o avatar
     });
   };
-  
 
   const handleUpdate = async () => {
     try {
@@ -67,13 +63,13 @@ export default function Doctors() {
         !doctorData.name.trim() ||
         !doctorData.specialization.trim() ||
         !doctorData.gender.trim() ||
-        !doctorData.email.trim() || 
+        !doctorData.email.trim() ||
         !doctorData.age
       ) {
         Alert.alert('Erro', 'Todos os campos obrigatórios devem ser preenchidos');
         return;
       }
-  
+
       const url = `http://localhost:3000/doctor/${editingDoctor}`;
       const response = await fetch(url, {
         method: 'PUT',
@@ -82,20 +78,20 @@ export default function Doctors() {
         },
         body: JSON.stringify(doctorData),
       });
-  
+
       if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(errorMessage || 'Erro ao atualizar médico');
       }
-  
+
       Alert.alert('Sucesso', 'Médico atualizado com sucesso');
       setEditingDoctor(null);
-      setDoctorData({ name: '', specialization: '', gender: '', email: '', age: '' });
+      setDoctorData({ name: '', specialization: '', gender: '', email: '', age: '', avatar: '' });
       fetchDoctors();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
-  };  
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -104,8 +100,8 @@ export default function Doctors() {
       });
       if (!response.ok) throw new Error('Erro ao excluir médico');
       Alert.alert('Sucesso', 'Médico excluído com sucesso');
-      deleteDoctor(id);  
-      fetchDoctors();  
+      deleteDoctor(id);
+      fetchDoctors();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -117,6 +113,9 @@ export default function Doctors() {
 
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
+      {item.avatar && (
+        <Image source={{ uri: item.avatar }} style={styles.doctorImage} />
+      )}
       <Text style={styles.doctorName}>{item.name}</Text>
       <Text style={styles.specialty}>Especialização: {item.specialization}</Text>
       <Text style={styles.specialty}>Gênero: {item.gender}</Text>
@@ -203,6 +202,16 @@ export default function Doctors() {
               <Picker.Item key={index} label={g} value={g.toLowerCase()} />
             ))}
           </Picker>
+          <Text style={styles.label}>URL do Avatar:</Text>
+          <TextInput
+            value={doctorData.avatar}
+            onChangeText={(text) => setDoctorData({ ...doctorData, avatar: text })}
+            style={styles.input}
+            placeholder="Digite a URL do avatar"
+          />
+          {doctorData.avatar && (
+            <Image source={{ uri: doctorData.avatar }} style={styles.previewImage} />
+          )}
           <Button onPress={handleUpdate} style={styles.updateButton}>
             Atualizar Médico
           </Button>
@@ -260,6 +269,12 @@ const styles = StyleSheet.create({
   specialty: {
     fontSize: 16,
     color: '#666666',
+    marginBottom: 10,
+  },
+  doctorImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginBottom: 10,
   },
   buttonGroup: {
