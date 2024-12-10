@@ -1,16 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'; 
 import { useLoginStore } from '../../stores/useLoginStore'; 
+
 export default function Header() {
   const { name, avatar } = useLoginStore();
 
- 
   const handleLogoPress = () => {
     window.location.href = '/'; 
   };
 
-  const handleCreateAccountPress = () => {
-    window.location.href = '/create-account';
+  const handleProfilePress = () => {
+    if (name) {
+      window.location.href = '/update'; // Redireciona para a página de atualização de perfil
+    } else {
+      window.location.href = '/login'; // Redireciona para a página de login
+    }
   };
 
   return (
@@ -26,16 +30,20 @@ export default function Header() {
       {/* Título "Datahealth" */}
       <Text style={styles.title}>Datahealth</Text>
 
-      {/* Informações do usuário e ícone de menu */}
-      <View style={styles.profileContainer}>
-        <Image 
-          style={styles.avatar}
-          source={avatar} 
-        />
-        <Text style={styles.name}>{name}</Text>
-
-       
-      </View>
+      {/* Botão de perfil ou login */}
+      <TouchableOpacity style={styles.profileContainer} onPress={handleProfilePress}>
+        {name ? (
+          <>
+            <Image 
+              style={styles.avatar}
+              source={avatar} 
+            />
+            <Text style={styles.name}>{name}</Text>
+          </>
+        ) : (
+          <Text style={styles.loginText}>Entrar</Text>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }
@@ -62,6 +70,9 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#F5F5F7', 
+    borderRadius: 20, 
   },
   avatar: {
     width: 40,
@@ -73,7 +84,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6c8ebf',
   },
-  menu: {
-    marginLeft: 20, 
+  loginText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#6c8ebf',
   },
 });

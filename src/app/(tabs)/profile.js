@@ -1,51 +1,117 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Button from '../../Views/components/Button';
+import { useRouter } from 'expo-router';
 
 export default function Profile() {
+  const router = useRouter();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
 
-  const handleSave = () => {
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const storedProfile = await AsyncStorage.getItem('@profile');
+        if (storedProfile) {
+          setProfileData(JSON.parse(storedProfile));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  const handleSave = async () => {
+    const { name, email, password } = profileData;
+
     if (!name || !email || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
 
-    Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+    try {
+      await AsyncStorage.setItem('@profile', JSON.stringify(profileData));
+      Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar perfil:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o perfil.');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await AsyncStorage.removeItem('@profile');
+      setProfileData({ name: '', email: '', password: '' });
+      Alert.alert('Sucesso', 'Perfil excluído com sucesso!');
+      router.replace('/login');
+    } catch (error) {
+      console.error('Erro ao excluir perfil:', error);
+      Alert.alert('Erro', 'Não foi possível excluir o perfil.');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userLogged');
+      router.replace('/login');
+    } catch (error) {
+      console.error('Erro ao sair da conta:', error);
+      Alert.alert('Erro ao sair da conta.');
+    }
+  };
+
+  const handleChange = (field, value) => {
+    setProfileData((prevData) => ({ ...prevData, [field]: value }));
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Atualizar Perfil</Text>
-    
+      <Text style={styles.title}>Meu Perfil</Text>
+
+      <Text style={styles.label}>Nome:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nome"
-        value={name}
-        onChangeText={setName}
+        placeholder="Digite seu nome"
+        value={profileData.name}
+        onChangeText={(value) => handleChange('name', value)}
       />
 
+      <Text style={styles.label}>E-mail:</Text>
       <TextInput
         style={styles.input}
-        placeholder="E-mail"
+        placeholder="Digite seu e-mail"
         keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        value={profileData.email}
+        onChangeText={(value) => handleChange('email', value)}
       />
 
+      <Text style={styles.label}>Senha:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nova Senha"
+        placeholder="Digite sua nova senha"
         secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        value={profileData.password}
+        onChangeText={(value) => handleChange('password', value)}
       />
 
-      <Button title="Salvar" onPress={handleSave} color="#4CAF50" />
-
-      <Text style={styles.subtitle}>Gerencie suas informações pessoais aqui.</Text>
+      <View style={styles.buttonGroup}>
+        <Button onPress={handleSave} style={styles.saveButton}>
+          Salvar Alterações
+        </Button>
+        <Button onPress={handleDelete} style={styles.deleteButton}>
+          Excluir Perfil
+        </Button>
+        <Button onPress={handleLogout} style={styles.logoutButton}>
+          Sair da Conta
+        </Button>
+      </View>
     </View>
   );
 }
@@ -53,31 +119,53 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: '#F5F5F7',
-    paddingHorizontal: 20, 
+    padding: 20,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#7B9ABB',
     marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666666',
-    marginTop: 20,
     textAlign: 'center',
   },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    color: '#444',
+  },
   input: {
-    width: '100%',
-    height: 45,
-    borderColor: '#ccc',
+    backgroundColor: '#FFF',
     borderWidth: 1,
+    borderColor: '#CCC',
     borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
     marginBottom: 15,
-    paddingLeft: 10,
-    backgroundColor: '#fff',
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  deleteButton: {
+    backgroundColor: '#FF5722',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  logoutButton: {
+    backgroundColor: '#7B9ABB',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
   },
 });
