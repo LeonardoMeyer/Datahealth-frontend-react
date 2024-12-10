@@ -17,32 +17,43 @@ export default function CreateRecord() {
     const [txtImgUrl, setTxtImgUrl] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
+    // Função para formatar a data no padrão brasileiro
+    const handleDateInput = (value) => {
+        // Remove qualquer caractere não numérico
+        let cleanedValue = value.replace(/\D/g, '');
+
+        // Adiciona as divisões "/" automaticamente
+        if (cleanedValue.length > 2 && cleanedValue.length <= 4) {
+            cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2)}`;
+        } else if (cleanedValue.length > 4) {
+            cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2, 4)}/${cleanedValue.slice(4, 8)}`;
+        }
+
+        setTxtDate(cleanedValue);
+    };
+
     const handleCreateRecord = async () => {
         if (!userId) {
             console.log('Erro: Usuário não encontrado');
             return;
         }
 
-        // Validação de dados de entrada
         if (!txtReport || !txtImgUrl || !txtDate) {
             setErrorMessage("Todos os campos obrigatórios devem ser preenchidos.");
             console.log("Campos obrigatórios não preenchidos corretamente.");
             return;
         }
 
-        let formattedDate = null;
-        const dateInput = new Date(txtDate);
-
-        // Verificando se a data é válida
-        if (!isNaN(dateInput)) {
-            formattedDate = dateInput.toISOString();
-        } else {
-            setErrorMessage("Data inválida!");
+        // Verifica se a data está no formato correto (dd/mm/yyyy) e converte para ISO
+        const dateParts = txtDate.split('/');
+        if (dateParts.length !== 3 || dateParts[0].length !== 2 || dateParts[1].length !== 2 || dateParts[2].length !== 4) {
+            setErrorMessage("Data inválida! Use o formato dd/mm/yyyy.");
             console.log('Data inválida:', txtDate);
             return;
         }
 
-        // Verificando o que está sendo enviado
+        const formattedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`).toISOString();
+
         const record = {
             report: txtReport,
             recipe: txtRecipe,
@@ -62,7 +73,6 @@ export default function CreateRecord() {
                 },
             });
 
-            // Se a resposta não for bem-sucedida, retorna a mensagem de erro
             if (!response.ok) {
                 const errorData = await response.json();
                 setErrorMessage(errorData.message || 'Erro ao criar o registro');
@@ -72,7 +82,7 @@ export default function CreateRecord() {
 
             const data = await response.json();
             addRecord(data.record);
-            router.replace('/home');  // Redirecionar para a página inicial
+            router.replace('/home'); 
 
         } catch (error) {
             console.error('Erro ao criar o prontuário:', error);
@@ -101,11 +111,12 @@ export default function CreateRecord() {
             <Text>Data:</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={setTxtDate}
+                onChangeText={handleDateInput}
                 value={txtDate}
-                placeholder='Digite a data (yyyy-mm-dd)...'
-                keyboardType='default'
+                placeholder='Digite a data (dd/mm/yyyy)...'
+                keyboardType='numeric'
                 placeholderTextColor='#DDDDDD'
+                maxLength={10}
             />
             <Text>URL do Exame:</Text>
             <TextInput
