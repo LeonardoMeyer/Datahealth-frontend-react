@@ -1,4 +1,4 @@
-// hooks/useImagePicker.js
+
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 

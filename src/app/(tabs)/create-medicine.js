@@ -1,3 +1,4 @@
+
 import { View, StyleSheet, Text, TextInput } from 'react-native';
 import { useState } from "react";
 import Button from '../../Views/components/Button';
@@ -11,6 +12,7 @@ export default function CreateMedicine() {
     const { addMedicine } = useMedicineStore();
     const { id: userId } = useLoginStore(); 
     const router = useRouter();
+
 
     const [txtName, setTxtName] = useState('');
     const [txtDescription, setTxtDescription] = useState('');
