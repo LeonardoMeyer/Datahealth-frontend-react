@@ -30,7 +30,6 @@ export default function Doctors() {
     "Ginecologia",
   ];
 
-  // Lista de gêneros adicionais
   const genderList = [
     "Mulher",
     "Homem",
@@ -39,58 +38,64 @@ export default function Doctors() {
     "Outro",
   ];
 
-  // Função para buscar médicos e atualizar o store Zustand
   const fetchDoctors = async () => {
     try {
       const response = await fetch('http://localhost:3000/doctor/list');
       if (!response.ok) throw new Error('Erro ao buscar médicos');
       const data = await response.json();
-      setDoctors(data.doctors);  // Atualizando o estado global com o Zustand
+      setDoctors(data.doctors); 
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
 
-  // Função para editar um médico
   const handleEdit = (doctor) => {
     setEditingDoctor(doctor.id); 
     setDoctorData({
       name: doctor.name,
       specialization: doctor.specialization,
       gender: doctor.gender,
+      email: doctor.email,
+      age: doctor.age,    
     });
   };
+  
 
-const handleUpdate = async () => {
-  try {
-    if (!doctorData.name || !doctorData.specialization || !doctorData.gender) {
-      Alert.alert('Erro', 'Todos os campos devem ser preenchidos');
-      return;
+  const handleUpdate = async () => {
+    try {
+      if (
+        !doctorData.name.trim() ||
+        !doctorData.specialization.trim() ||
+        !doctorData.gender.trim() ||
+        !doctorData.email.trim() || 
+        !doctorData.age
+      ) {
+        Alert.alert('Erro', 'Todos os campos obrigatórios devem ser preenchidos');
+        return;
+      }
+  
+      const url = `http://localhost:3000/doctor/${editingDoctor}`;
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(doctorData),
+      });
+  
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Erro ao atualizar médico');
+      }
+  
+      Alert.alert('Sucesso', 'Médico atualizado com sucesso');
+      setEditingDoctor(null);
+      setDoctorData({ name: '', specialization: '', gender: '', email: '', age: '' });
+      fetchDoctors();
+    } catch (error) {
+      Alert.alert('Erro', error.message);
     }
-    const url = `http://localhost:3000/doctor/${editingDoctor}`;
-
-    const response = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(doctorData), 
-    });
-
-    if (!response.ok) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage || 'Erro ao atualizar médico');
-    }
-
-    Alert.alert('Sucesso', 'Médico atualizado com sucesso');
-    setEditingDoctor(null);
-    setDoctorData({ name: '', specialization: '', gender: '' });
-    fetchDoctors();
-  } catch (error) {
-    Alert.alert('Erro', error.message);
-  }
-};
-
+  };  
 
   const handleDelete = async (id) => {
     try {
