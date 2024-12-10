@@ -22,32 +22,7 @@ export default function Records() {
     }
   };
 
-  const handleUpdateRecord = async (id) => {
-    const updatedRecord = {
-      id: id,
-      report: 'Relatório Atualizado',
-      exam: 'http://example.com/exam-updated.jpg', 
-      recipe: 'Receita médica atualizada',
-      date: '2024-12-05',
-    };
 
-    try {
-      const response = await fetchAuth(`http://localhost:3000/record/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedRecord),
-      });
-
-      if (!response.ok) throw new Error('Erro ao atualizar registro');
-      const data = await response.json();
-      updateRecord(data);
-      Alert.alert('Sucesso', 'Registro atualizado com sucesso');
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
-  };
 
   const handleDeleteRecord = async (id) => {
     try {
