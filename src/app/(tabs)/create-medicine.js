@@ -1,24 +1,23 @@
-import { View, StyleSheet, Text, TextInput } from 'react-native'
-import { useState } from "react"
-import Button from '../../Views/components/Button'
-import { useRouter } from 'expo-router'
-import { useMedicineStore } from '../../stores/useMedicineStore'
-import { useLoginStore } from '../../stores/useLoginStore'  // Importando a store de login
-import { fetchAuth } from '../../utils/fetchAuth'
+import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { useState } from "react";
+import Button from '../../Views/components/Button';
+import { useRouter } from 'expo-router';
+import { useMedicineStore } from '../../stores/useMedicineStore';
+import { useLoginStore } from '../../stores/useLoginStore'; 
+import { fetchAuth } from '../../utils/fetchAuth';
 
 export default function CreateMedicine() {
 
-    const { addMedicine } = useMedicineStore()
-    const { id: userId } = useLoginStore()  // Obtendo o userId da store de login
-    const router = useRouter()
+    const { addMedicine } = useMedicineStore();
+    const { id: userId } = useLoginStore(); 
+    const router = useRouter();
 
-    const [txtName, setTxtName] = useState('')          
-    const [txtDescription, setTxtDescription] = useState('') 
-    const [txtPeriod, setTxtPeriod] = useState('')      
-    const [txtImgUrl, setTxtImgUrl] = useState('')      
+    const [txtName, setTxtName] = useState('');
+    const [txtDescription, setTxtDescription] = useState('');
+    const [txtPeriod, setTxtPeriod] = useState('');
+    const [txtImgUrl, setTxtImgUrl] = useState('');
 
     const handleCreateMedicine = async () => {
-        // Verificando se o userId existe
         if (!userId) {
             console.log('Erro: Usuário não encontrado');
             return;
@@ -29,24 +28,23 @@ export default function CreateMedicine() {
             description: txtDescription,
             period: txtPeriod,
             image_url: txtImgUrl,
-            user_id: userId  // Adicionando o user_id ao payload
-        }
+            user_id: userId  
+        };
 
         const response = await fetchAuth('http://localhost:3000/medication', {
             method: 'POST',
             body: JSON.stringify(medicine)
-        })
+        });
 
         if (response.ok) {
-            const data = await response.json()
-            addMedicine(data.medicine)  
-            router.replace('/home')     
-            return
+            const data = await response.json();
+            addMedicine(data.medicine); 
+            router.replace('/home');     
         }
 
-        console.log('Erro ao carregar medicamentos')
-        return
-    }
+        console.log('Erro ao carregar medicamentos');
+        return;
+    };
 
     return (
         <View style={styles.container}>
@@ -86,12 +84,12 @@ export default function CreateMedicine() {
             />
             <Button onPress={handleCreateMedicine}>Cadastrar</Button>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20
+        padding: 20,
     },
     input: {
         borderWidth: 1,
@@ -100,7 +98,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 6,
         marginVertical: 5,
-        borderRadius: 5
-    }
-})
-''
+        borderRadius: 5,
+    },
+});

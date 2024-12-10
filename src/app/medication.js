@@ -1,49 +1,23 @@
-import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Alert, Image } from 'react-native';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { useMedicineStore } from '../stores/useMedicineStore';
+import { useMedicationStore } from '../stores/useMedicationStore';
 import { fetchAuth } from '../utils/fetchAuth';
 
 export default function Medications() {
   const router = useRouter();
-  const { medications, setMedications, deleteMedication, updateMedication } = useMedicineStore();
+  const { medications, setMedications, deleteMedication } = useMedicationStore();
 
   const fetchMedications = async () => {
     try {
       const response = await fetchAuth('http://localhost:3000/medication/list', {
         method: 'GET',
       });
-      if (!response.ok) throw new Error('Erro ao buscar registros');
+      if (!response.ok) throw new Error('Erro ao buscar medicamentos');
       const data = await response.json();
-      setMedications(data.medications);
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
-  };
-
-  const handleUpdateMedication = async (id) => {
-    const updatedMedication = {
-      id: id,
-      medicine: 'Relatório Atualizado',
-      image: 'http://example.com/exam-updated.jpg',
-      description: 'Receita médica atualizada',
-      period: '7',
-    };
-
-    try {
-      const response = await fetchAuth(`http://localhost:3000/medication/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedMedication),
-      });
-
-      if (!response.ok) throw new Error('Erro ao atualizar registro');
-      const data = await response.json();
-      updateMedication(data);
-      Alert.alert('Sucesso', 'Registro atualizado com sucesso');
+      console.log('Fetched medications:', data);
+      setMedications(data);
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -55,9 +29,9 @@ export default function Medications() {
         method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Erro ao excluir registro');
-      deleteMedication(id);
-      Alert.alert('Sucesso', 'Registro excluído com sucesso');
+      if (!response.ok) throw new Error('Erro ao excluir medicamento');
+      deleteMedication(id); 
+      Alert.alert('Sucesso', 'Medicamento excluído com sucesso');
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
@@ -67,20 +41,29 @@ export default function Medications() {
     fetchMedications();
   }, []);
 
-  const renderMedication = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.doctorName}>{item.medicine}</Text>
-      <Text style={styles.specialty}>{item.description}</Text>
-      <View style={styles.buttonGroup}>
-        <Button onPress={() => handleUpdateMedication(item.id)} style={styles.updateButton}>
-          Atualizar
-        </Button>
-        <Button onPress={() => handleDeleteMedication(item.id)} style={styles.deleteButton}>
-          Excluir
-        </Button>
+  const renderMedication = ({ item }) => {
+    return (
+      <View style={styles.card}>
+        <Text style={styles.medicationName}>{item.medicine}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+        {item.image && (
+          <Image source={{ uri: item.image }} style={styles.medicationImage} />
+        )}
+        <Text style={styles.period}>Período: {item.period} dias</Text>
+        <View style={styles.buttonGroup}>
+          <Button
+            onPress={() => router.push(`/EditMedication`)} 
+            style={styles.updateButton}
+          >
+            Atualizar
+          </Button>
+          <Button onPress={() => handleDeleteMedication(item.id)} style={styles.deleteButton}>
+            Excluir
+          </Button>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -93,7 +76,7 @@ export default function Medications() {
           <Text style={styles.emptyMessage}>Nenhum medicamento encontrado.</Text>
         )}
       />
-      <Button onPress={() => router.push('/create-medicine')} style={styles.addButton}>
+     <Button onPress={() => router.push('/create-medicine')} style={styles.addButton}>
         + Adicionar Novo Medicamento
       </Button>
     </View>
@@ -122,13 +105,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  doctorName: {
+  medicationName: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  specialty: {
+  description: {
     fontSize: 16,
     color: '#666666',
+    marginBottom: 10,
+  },
+  medicationImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  period: {
+    fontSize: 16,
+    color: '#777',
     marginBottom: 10,
   },
   buttonGroup: {

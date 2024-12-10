@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View, Text, Alert } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Alert, Image } from 'react-native';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
@@ -26,7 +26,7 @@ export default function Records() {
     const updatedRecord = {
       id: id,
       report: 'Relatório Atualizado',
-      exam: 'http://example.com/exam-updated.jpg',
+      exam: 'http://example.com/exam-updated.jpg', 
       recipe: 'Receita médica atualizada',
       date: '2024-12-05',
     };
@@ -71,6 +71,10 @@ export default function Records() {
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.report}</Text>
       <Text style={styles.specialty}>{item.date}</Text>
+      {/* Exibindo a imagem do exame */}
+      {item.exam && (
+        <Image source={{ uri: item.exam }} style={styles.examImage} />
+      )}
       <View style={styles.buttonGroup}>
         <Button onPress={() => handleUpdateRecord(item.id)} style={styles.updateButton}>
           Atualizar
@@ -130,6 +134,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666666',
     marginBottom: 10,
+  },
+  examImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginVertical: 10,
+    resizeMode: 'contain',  
   },
   buttonGroup: {
     flexDirection: 'row',

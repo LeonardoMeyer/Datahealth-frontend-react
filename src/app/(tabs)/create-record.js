@@ -1,179 +1,142 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { useState } from "react";
+import Button from '../../Views/components/Button';
 import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
 import { useRecordStore } from '../../stores/useRecordStore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLoginStore } from '../../stores/useLoginStore'; 
+import { fetchAuth } from '../../utils/fetchAuth';
 
-export default function CreateAccount() {
-  const { addRecord } = useRecordStore();
-  const router = useRouter();
+export default function CreateRecord() {
+    const { addRecord } = useRecordStore();
+    const { id: userId } = useLoginStore(); 
+    const router = useRouter();
 
-  const [txtReport, setTxtReport] = useState('');
-  const [txtRecipe, setTxtRecipe] = useState('');
-  const [txtDate, setTxtDate] = useState('');
-  const [imageUri, setImageUri] = useState(null);
-  const [loading, setLoading] = useState(false);
+    const [txtReport, setTxtReport] = useState('');
+    const [txtRecipe, setTxtRecipe] = useState('');
+    const [txtDate, setTxtDate] = useState('');
+    const [txtImgUrl, setTxtImgUrl] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
-  const handleImagePicker = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
+    const handleCreateRecord = async () => {
+        if (!userId) {
+            console.log('Erro: Usuário não encontrado');
+            return;
+        }
 
-    if (!result.canceled) {
-      setImageUri(result.uri);
-    }
-  };
+        // Validação de dados de entrada
+        if (!txtReport || !txtImgUrl || !txtDate) {
+            setErrorMessage("Todos os campos obrigatórios devem ser preenchidos.");
+            console.log("Campos obrigatórios não preenchidos corretamente.");
+            return;
+        }
 
-  const handleCreateRecord = async () => {
-    setLoading(true);
-    const id = await AsyncStorage.getItem('id');
+        let formattedDate = null;
+        const dateInput = new Date(txtDate);
 
-    if (!id) {
-      Alert.alert('Erro', 'Usuário não encontrado. Por favor, faça login novamente.');
-      setLoading(false);
-      return;
-    }
+        // Verificando se a data é válida
+        if (!isNaN(dateInput)) {
+            formattedDate = dateInput.toISOString();
+        } else {
+            setErrorMessage("Data inválida!");
+            console.log('Data inválida:', txtDate);
+            return;
+        }
 
-    if (!txtReport || !txtDate || !imageUri) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
-      setLoading(false);
-      return;
-    }
+        // Verificando o que está sendo enviado
+        const record = {
+            report: txtReport,
+            recipe: txtRecipe,
+            exam: txtImgUrl,
+            user_id: userId,
+            date: formattedDate,
+        };
 
-    const formData = new FormData();
-    formData.append('report', txtReport);
-    formData.append('recipe', txtRecipe);
-    formData.append('date', txtDate);
-    formData.append('user_id', id);
+        console.log("Dados sendo enviados para o servidor:", record);
 
-    const uriParts = imageUri.split('.');
-    const fileType = uriParts[uriParts.length - 1];
+        try {
+            const response = await fetchAuth('http://localhost:3000/record', {
+                method: 'POST',
+                body: JSON.stringify(record),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-    formData.append('exam', {
-      uri: imageUri,
-      name: `exam.${fileType}`,
-      type: `image/${fileType}`,
-    });
+            // Se a resposta não for bem-sucedida, retorna a mensagem de erro
+            if (!response.ok) {
+                const errorData = await response.json();
+                setErrorMessage(errorData.message || 'Erro ao criar o registro');
+                console.log('Erro no envio:', errorData.message);
+                return;
+            }
 
-    try {
-      const response = await fetch('http://localhost:3000/record', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        body: formData,
-      });
+            const data = await response.json();
+            addRecord(data.record);
+            router.replace('/home');  // Redirecionar para a página inicial
 
-      if (response.ok) {
-        const data = await response.json();
-        addRecord(data.record);
-        router.replace('/home');
-        Alert.alert('Sucesso', 'Relatório cadastrado com sucesso!');
-      } else {
-        const errorData = await response.json();
-        console.error('Erro ao criar record:', errorData);
-        Alert.alert('Erro', 'Falha ao cadastrar o relatório. Tente novamente.');
-      }
-    } catch (error) {
-      console.error('Erro ao enviar dados:', error);
-      Alert.alert('Erro', 'Ocorreu um erro inesperado. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        } catch (error) {
+            console.error('Erro ao criar o prontuário:', error);
+            setErrorMessage('Erro ao criar o registro');
+        }
+    };
 
-  return (
-    <View style={styles.container}>
-      <ScrollView style={styles.formContainer}>
-        <Text style={styles.sectionTitle}>Cadastrar Relatório</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome do Relatório"
-          onChangeText={setTxtReport}
-          value={txtReport}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nome da Receita"
-          onChangeText={setTxtRecipe}
-          value={txtRecipe}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Data (YYYY-MM-DD)"
-          onChangeText={setTxtDate}
-          value={txtDate}
-        />
-        <TouchableOpacity style={styles.imageButton} onPress={handleImagePicker}>
-          <Text style={styles.imageButtonText}>Escolher Imagem do Exame</Text>
-        </TouchableOpacity>
-        {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
-        <TouchableOpacity
-          style={[styles.confirmButton, { opacity: loading ? 0.5 : 1 }]}
-          onPress={handleCreateRecord}
-          disabled={loading}
-        >
-          <Text style={styles.confirmButtonText}>
-            {loading ? 'Carregando...' : 'Cadastrar'}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <Text>Relatório:</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={setTxtReport}
+                value={txtReport}
+                placeholder='Digite o relatório...'
+                placeholderTextColor='#DDDDDD'
+            />
+            <Text>Receita:</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={setTxtRecipe}
+                value={txtRecipe}
+                placeholder='Digite a receita...'
+                placeholderTextColor='#DDDDDD'
+            />
+            <Text>Data:</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={setTxtDate}
+                value={txtDate}
+                placeholder='Digite a data (yyyy-mm-dd)...'
+                keyboardType='default'
+                placeholderTextColor='#DDDDDD'
+            />
+            <Text>URL do Exame:</Text>
+            <TextInput
+                style={styles.input}
+                onChangeText={setTxtImgUrl}
+                value={txtImgUrl}
+                placeholder='Digite a URL do exame...'
+                keyboardType='url'
+                placeholderTextColor='#DDDDDD'
+            />
+            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+            <Button onPress={handleCreateRecord}>Cadastrar</Button>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  formContainer: {
-    flex: 1,
-  },
-  input: {
-    height: 40,
-    borderColor: '#000',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#7B9ABB',
-    marginBottom: 10,
-  },
-  imageButton: {
-    backgroundColor: '#7B9ABB',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  imageButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  imagePreview: {
-    width: '100%',
-    height: 200,
-    marginVertical: 10,
-    borderRadius: 10,
-  },
-  confirmButton: {
-    backgroundColor: '#7B9ABB',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+    container: {
+        padding: 20,
+    },
+    input: {
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: '#444444',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        marginVertical: 5,
+        borderRadius: 5,
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 10,
+    },
 });

@@ -16,14 +16,11 @@ export default function Home() {
           Use os botões abaixo para acessar diferentes funcionalidades do sistema.
         </Text>
         <View style={styles.buttonContainer}>
-          <Button onPress={() => router.push('/create-record')} style={styles.button}>
-            Novo Registro
+        <Button onPress={() => router.push('/record')} style={styles.button}>
+            Prontuários
           </Button>
           <Button onPress={() => router.push('/medication')} style={styles.button}>
             Medicação
-          </Button>
-          <Button onPress={() => router.push('/prescriptions')} style={styles.button}>
-            Receitas
           </Button>
           <Button onPress={() => router.push('/doctors')} style={styles.button}>
             Médicos
