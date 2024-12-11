@@ -10,7 +10,6 @@ export default function UpdateMedication() {
   const { id } = useLocalSearchParams();
   const { medications, updateMedication } = useMedicationStore();
 
-  // Converte o ID para número, validando se é válido
   const medication = medications.find((item) => item.id === Number(id));
 
   const [txtMedicine, setTxtMedicine] = useState(medication?.medicine || '');

@@ -15,7 +15,7 @@ export default function UpdateRecord() {
   const [txtReport, setTxtReport] = useState(record?.report || '');
   const [txtRecipe, setTxtRecipe] = useState(record?.recipe || '');
   const [txtDate, setTxtDate] = useState(record?.date || '');
-  const [txtImgUrl, setTxtImgUrl] = useState(record?.image_url || ''); 
+  const [txtImgUrl, setTxtImgUrl] = useState(record?.exam || ''); 
 
   useEffect(() => {
     if (!record) {
@@ -54,7 +54,7 @@ export default function UpdateRecord() {
       report: txtReport,
       recipe: txtRecipe,
       date: formattedDate,
-      image_url: txtImgUrl,
+      exam: txtImgUrl,
     };
 
     try {
