@@ -1,5 +1,5 @@
-import { View, StyleSheet, Text, TextInput, Alert } from 'react-native';
-import { useState } from 'react';
+import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { useState } from "react";
 import Button from '../../Views/components/Button';
 import { useRouter } from 'expo-router';
 import { useRecordStore } from '../../stores/useRecordStore';
@@ -11,16 +11,12 @@ export default function CreateRecord() {
     const { id: userId } = useLoginStore(); 
     const router = useRouter();
 
-    const [formData, setFormData] = useState({
-        report: '',
-        recipe: '',
-        date: '',
-        imageUrl: '',
-    });
-
+    const [txtReport, setTxtReport] = useState('');
+    const [txtRecipe, setTxtRecipe] = useState('');
+    const [txtDate, setTxtDate] = useState('');
+    const [txtImgUrl, setTxtImgUrl] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-<<<<<<< HEAD
     // Função para formatar a data no padrão brasileiro
     const handleDateInput = (value) => {
         // Remove qualquer caractere não numérico
@@ -34,42 +30,14 @@ export default function CreateRecord() {
         }
 
         setTxtDate(cleanedValue);
-=======
-    const handleInputChange = (field, value) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-        setErrorMessage(''); // Clear error messages when editing
-    };
-
-    const validateForm = () => {
-        const { report, date, imageUrl } = formData;
-
-        if (!report || !date || !imageUrl) {
-            setErrorMessage("Todos os campos obrigatórios devem ser preenchidos.");
-            return false;
-        }
-
-        const parsedDate = new Date(date);
-        if (isNaN(parsedDate)) {
-            setErrorMessage("Data inválida! Use o formato yyyy-mm-dd.");
-            return false;
-        }
-
-        if (!imageUrl.startsWith('http') || !imageUrl.includes('.')) {
-            setErrorMessage("URL inválida. Certifique-se de que começa com 'http' e contém um formato válido.");
-            return false;
-        }
-
-        return true;
->>>>>>> 41896254d55491714f7336b2c203d9e9d41bad74
     };
 
     const handleCreateRecord = async () => {
         if (!userId) {
-            console.error('Erro: Usuário não encontrado');
+            console.log('Erro: Usuário não encontrado');
             return;
         }
 
-<<<<<<< HEAD
         if (!txtReport || !txtImgUrl || !txtDate) {
             setErrorMessage("Todos os campos obrigatórios devem ser preenchidos.");
             console.log("Campos obrigatórios não preenchidos corretamente.");
@@ -85,49 +53,41 @@ export default function CreateRecord() {
         }
 
         const formattedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`).toISOString();
-=======
-        if (!validateForm()) {
-            return;
-        }
-
-        const { report, recipe, date, imageUrl } = formData;
-        const formattedDate = new Date(date).toISOString();
->>>>>>> 41896254d55491714f7336b2c203d9e9d41bad74
 
         const record = {
-            report,
-            recipe,
-            exam: imageUrl,
+            report: txtReport,
+            recipe: txtRecipe,
+            exam: txtImgUrl,
             user_id: userId,
             date: formattedDate,
         };
 
+        console.log("Dados sendo enviados para o servidor:", record);
+
         try {
-            console.log("Enviando dados para o servidor:", record);
             const response = await fetchAuth('http://localhost:3000/record', {
                 method: 'POST',
                 body: JSON.stringify(record),
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Erro no servidor:', errorData);
                 setErrorMessage(errorData.message || 'Erro ao criar o registro');
+                console.log('Erro no envio:', errorData.message);
                 return;
             }
 
             const data = await response.json();
             addRecord(data.record);
-            Alert.alert('Sucesso', 'Registro criado com sucesso!');
-            router.replace('/home');
->>>>>>> 41896254d55491714f7336b2c203d9e9d41bad74
+            router.replace('/home'); 
+
         } catch (error) {
-            console.error('Erro na requisição:', error);
+            console.error('Erro ao criar o prontuário:', error);
             setErrorMessage('Erro ao criar o registro');
         }
-        console.log("Dados enviados ao servidor:", record);
-
     };
 
     return (
@@ -135,45 +95,38 @@ export default function CreateRecord() {
             <Text>Relatório:</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={(value) => handleInputChange('report', value)}
-                value={formData.report}
+                onChangeText={setTxtReport}
+                value={txtReport}
                 placeholder='Digite o relatório...'
                 placeholderTextColor='#DDDDDD'
             />
             <Text>Receita:</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={(value) => handleInputChange('recipe', value)}
-                value={formData.recipe}
+                onChangeText={setTxtRecipe}
+                value={txtRecipe}
                 placeholder='Digite a receita...'
                 placeholderTextColor='#DDDDDD'
             />
             <Text>Data:</Text>
             <TextInput
                 style={styles.input}
-<<<<<<< HEAD
                 onChangeText={handleDateInput}
                 value={txtDate}
                 placeholder='Digite a data (dd/mm/yyyy)...'
                 keyboardType='numeric'
-=======
-                onChangeText={(value) => handleInputChange('date', value)}
-                value={formData.date}
-                placeholder='Digite a data (yyyy-mm-dd)...'
->>>>>>> 41896254d55491714f7336b2c203d9e9d41bad74
                 placeholderTextColor='#DDDDDD'
                 maxLength={10}
             />
             <Text>URL do Exame:</Text>
             <TextInput
                 style={styles.input}
-                onChangeText={(value) => handleInputChange('imageUrl', value)}
-                value={formData.imageUrl}
+                onChangeText={setTxtImgUrl}
+                value={txtImgUrl}
                 placeholder='Digite a URL do exame...'
-                placeholderTextColor='#DDDDDD'
                 keyboardType='url'
+                placeholderTextColor='#DDDDDD'
             />
-            
             {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
             <Button onPress={handleCreateRecord}>Cadastrar</Button>
         </View>
@@ -186,6 +139,7 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
+        borderStyle: 'solid',
         borderColor: '#444444',
         paddingHorizontal: 10,
         paddingVertical: 6,
