@@ -17,12 +17,9 @@ export default function CreateRecord() {
     const [txtImgUrl, setTxtImgUrl] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    // Função para formatar a data no padrão brasileiro
     const handleDateInput = (value) => {
-        // Remove qualquer caractere não numérico
         let cleanedValue = value.replace(/\D/g, '');
 
-        // Adiciona as divisões "/" automaticamente
         if (cleanedValue.length > 2 && cleanedValue.length <= 4) {
             cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2)}`;
         } else if (cleanedValue.length > 4) {
@@ -44,7 +41,6 @@ export default function CreateRecord() {
             return;
         }
 
-        // Verifica se a data está no formato correto (dd/mm/yyyy) e converte para ISO
         const dateParts = txtDate.split('/');
         if (dateParts.length !== 3 || dateParts[0].length !== 2 || dateParts[1].length !== 2 || dateParts[2].length !== 4) {
             setErrorMessage("Data inválida! Use o formato dd/mm/yyyy.");
