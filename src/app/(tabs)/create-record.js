@@ -53,7 +53,7 @@ export default function CreateRecord() {
         const record = {
             report: txtReport,
             recipe: txtRecipe,
-            exam: txtImgUrl,
+            image_url: txtImgUrl,
             user_id: userId,
             date: formattedDate,
         };
