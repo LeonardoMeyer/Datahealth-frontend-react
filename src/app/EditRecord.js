@@ -1,150 +1,131 @@
-import { FlatList, StyleSheet, View, Text, Alert, Image } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
 import Button from '../Views/components/Button';
-import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useRecordStore } from '../stores/useRecordStore';
 import { fetchAuth } from '../utils/fetchAuth';
 
-export default function Records() {
+export default function UpdateRecord() {
   const router = useRouter();
-  const { records, setRecords, deleteRecord, updateRecord } = useRecordStore();
-  
-  const fetchRecords = async () => {
-    try {
-      const response = await fetchAuth('http://localhost:3000/record/list', {
-        method: 'GET',
-      });
-      if (!response.ok) throw new Error('Erro ao buscar registros');
-      const data = await response.json();
-      setRecords(data.records);
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
-  };
+  const { id } = useLocalSearchParams();
+  const { records, updateRecord } = useRecordStore();
 
+  const record = records.find((item) => item.id === Number(id));
 
-
-  const handleDeleteRecord = async (id) => {
-    try {
-      const response = await fetchAuth(`http://localhost:3000/record/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) throw new Error('Erro ao excluir registro');
-      deleteRecord(id);
-      Alert.alert('Sucesso', 'Registro excluído com sucesso');
-    } catch (error) {
-      Alert.alert('Erro', error.message);
-    }
-  };
+  const [txtReport, setTxtReport] = useState(record?.report || '');
+  const [txtRecipe, setTxtRecipe] = useState(record?.recipe || '');
+  const [txtDate, setTxtDate] = useState(record?.date || '');
+  const [txtImgUrl, setTxtImgUrl] = useState(record?.image_url || ''); 
 
   useEffect(() => {
-    fetchRecords();
-  }, []);
+    if (!record) {
+      Alert.alert('Erro', 'Registro não encontrado.');
+      router.push('/home'); 
+    }
+  }, [record]);
 
-  const renderRecord = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.doctorName}>{item.report}</Text>
-      <Text style={styles.specialty}>{item.date}</Text>
-      {/* Exibindo a imagem do exame */}
-      {item.exam && (
-        <Image source={{ uri: item.exam }} style={styles.examImage} />
-      )}
-      <View style={styles.buttonGroup}>
-        <Button onPress={() => handleUpdateRecord(item.id)} style={styles.updateButton}>
-          Atualizar
-        </Button>
-        <Button onPress={() => handleDeleteRecord(item.id)} style={styles.deleteButton}>
-          Excluir
-        </Button>
-      </View>
-    </View>
-  );
+  const handleDateInput = (value) => {
+    let cleanedValue = value.replace(/\D/g, ''); 
+
+    if (cleanedValue.length > 2 && cleanedValue.length <= 4) {
+      cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2)}`;
+    } else if (cleanedValue.length > 4) {
+      cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2, 4)}/${cleanedValue.slice(4, 8)}`;
+    }
+
+    setTxtDate(cleanedValue); 
+  };
+
+  const handleUpdateRecord = async () => {
+    if (!txtReport || !txtRecipe || !txtDate) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const dateParts = txtDate.split('/');
+    if (dateParts.length !== 3 || dateParts[0].length !== 2 || dateParts[1].length !== 2 || dateParts[2].length !== 4) {
+      Alert.alert('Erro', 'Data inválida! Use o formato dd/mm/yyyy.');
+      return;
+    }
+
+    const formattedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`).toISOString();
+
+    const updatedRecord = {
+      report: txtReport,
+      recipe: txtRecipe,
+      date: formattedDate,
+      image_url: txtImgUrl,
+    };
+
+    try {
+      const response = await fetchAuth(`http://localhost:3000/record/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedRecord),
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao atualizar o registro');
+      }
+
+      const data = await response.json();
+      updateRecord(data.record); 
+      Alert.alert('Sucesso', 'Registro atualizado com sucesso!');
+      router.back(); 
+    } catch (error) {
+      Alert.alert('Erro', error.message); 
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Lista de Registros Médicos</Text>
-      <FlatList
-        data={records}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderRecord}
-        ListEmptyComponent={() => (
-          <Text style={styles.emptyMessage}>Nenhum registro encontrado.</Text>
-        )}
+      <Text>Relatório:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setTxtReport}
+        value={txtReport}
+        placeholder="Digite o relatório..."
       />
-      <Button onPress={() => router.push('/create-record')} style={styles.addButton}>
-        + Adicionar Novo Registro
-      </Button>
+      <Text>Receita:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setTxtRecipe}
+        value={txtRecipe}
+        placeholder="Digite a receita..."
+      />
+      <Text>Data:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={handleDateInput}
+        value={txtDate}
+        placeholder="Digite a data (dd/mm/yyyy)..."
+        keyboardType="numeric"
+        maxLength={10}
+      />
+      <Text>URL da Imagem:</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setTxtImgUrl}
+        value={txtImgUrl}
+        placeholder="Digite a URL da imagem..."
+        keyboardType="url"
+      />
+      <Button onPress={handleUpdateRecord}>Atualizar</Button>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#F5F5F7',
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#7B9ABB',
-    marginBottom: 20,
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  doctorName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  specialty: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 10,
-  },
-  examImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginVertical: 10,
-    resizeMode: 'contain',  
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  updateButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+  input: {
+    borderWidth: 1,
+    borderColor: '#444444',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginVertical: 5,
     borderRadius: 5,
-  },
-  deleteButton: {
-    backgroundColor: '#FF5722',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  addButton: {
-    backgroundColor: '#7B9ABB',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'center',
-    marginTop: 20,
-  },
-  emptyMessage: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#666',
-    marginTop: 20,
   },
 });

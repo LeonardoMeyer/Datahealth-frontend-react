@@ -29,7 +29,7 @@ export default function CreateMedicine() {
             medicine: txtName,
             description: txtDescription,
             period: txtPeriod,
-            image_url: txtImgUrl,
+            image: txtImgUrl,
             user_id: userId  
         };
 

@@ -8,7 +8,7 @@ import { fetchAuth } from '../utils/fetchAuth';
 export default function Records() {
   const router = useRouter();
   const { records, setRecords, deleteRecord, updateRecord } = useRecordStore();
-  
+
   const fetchRecords = async () => {
     try {
       const response = await fetchAuth('http://localhost:3000/record/list', {
@@ -21,8 +21,6 @@ export default function Records() {
       Alert.alert('Erro', error.message);
     }
   };
-
-
 
   const handleDeleteRecord = async (id) => {
     try {
@@ -38,6 +36,10 @@ export default function Records() {
     }
   };
 
+  const handleUpdateRecord = (id) => {
+    router.push(`/EditRecord?id=${id}`);
+  };
+
   useEffect(() => {
     fetchRecords();
   }, []);
@@ -46,7 +48,6 @@ export default function Records() {
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.report}</Text>
       <Text style={styles.specialty}>{item.date}</Text>
-      {/* Exibindo a imagem do exame */}
       {item.exam && (
         <Image source={{ uri: item.exam }} style={styles.examImage} />
       )}
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginVertical: 10,
-    resizeMode: 'contain',  
+    resizeMode: 'contain',
   },
   buttonGroup: {
     flexDirection: 'row',
