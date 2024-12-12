@@ -3,11 +3,10 @@ import { FlatList, StyleSheet, View, Text, Alert, TextInput, Image } from 'react
 import { Picker } from '@react-native-picker/picker';
 import Button from '../Views/components/Button';
 import { useRouter } from 'expo-router';
-import { useDoctorStore } from '../stores/useDoctorStore'; // Importando o Zustand store
-
+import { useDoctorStore } from '../stores/useDoctorStore';
 export default function Doctors() {
   const router = useRouter();
-  const { doctors, setDoctors, deleteDoctor } = useDoctorStore(); // Acesso ao Zustand store
+  const { doctors, setDoctors, deleteDoctor } = useDoctorStore();
   const [specialization, setSpecialization] = useState('');
   const [gender, setGender] = useState('');
   const [editingDoctor, setEditingDoctor] = useState(null);
@@ -17,7 +16,7 @@ export default function Doctors() {
     gender: '',
     email: '',
     age: '',
-    avatar: '', // Adicionado para a URL da imagem
+    avatar: '', 
   });
 
   const specializationsList = [
@@ -53,7 +52,7 @@ export default function Doctors() {
       gender: doctor.gender,
       email: doctor.email,
       age: doctor.age,
-      avatar: doctor.avatar, // Adicionado para editar o avatar
+      avatar: doctor.avatar, 
     });
   };
 

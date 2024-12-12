@@ -59,9 +59,9 @@ export default function UpdateMedication() {
       }
 
       const data = await response.json();
-      updateMedication(data); // Atualiza o store local
+      updateMedication(data); 
       Alert.alert('Sucesso', 'Medicamento atualizado com sucesso!');
-      router.back(); // Retorna à página anterior
+      router.back(); 
     } catch (error) {
       console.error('Erro ao atualizar medicamento:', error);
       Alert.alert('Erro', error.message || 'Erro desconhecido ao atualizar medicamento.');
