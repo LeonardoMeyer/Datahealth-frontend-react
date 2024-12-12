@@ -11,7 +11,7 @@ export default function Profile() {
     name: '',
     email: '',
     password: '',
-    avatar: '', // Campo para armazenar a URL da foto
+    avatar: '', 
   });
 
   useEffect(() => {
