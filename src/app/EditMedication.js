@@ -25,21 +25,25 @@ export default function UpdateMedication() {
   }, [medication]);
 
   const handleUpdateMedication = async () => {
-    if (!txtMedicine || !txtDescription || !txtPeriod) {
+    if (!txtMedicine.trim() || !txtDescription.trim() || !txtPeriod.trim()) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
-    if (isNaN(parseInt(txtPeriod, 10)) || parseInt(txtPeriod, 10) <= 0) {
+    const parsedPeriod = parseInt(txtPeriod, 10);
+    if (isNaN(parsedPeriod) || parsedPeriod <= 0) {
       Alert.alert('Erro', 'O período deve ser um número positivo.');
       return;
     }
 
     const updatedMedication = {
-      medicine: txtMedicine,
-      description: txtDescription,
-      period: parseInt(txtPeriod, 10),
-      image: txtImgUrl,
+      medicine: txtMedicine.trim(),
+      description: txtDescription.trim(),
+      period: parsedPeriod,
+      image: txtImgUrl.trim(),
+      user_id: medication?.user_id, 
+      
+
     };
 
     try {
@@ -55,11 +59,12 @@ export default function UpdateMedication() {
       }
 
       const data = await response.json();
-      updateMedication(data);
+      updateMedication(data); // Atualiza o store local
       Alert.alert('Sucesso', 'Medicamento atualizado com sucesso!');
-      router.back();
+      router.back(); // Retorna à página anterior
     } catch (error) {
-      Alert.alert('Erro', error.message);
+      console.error('Erro ao atualizar medicamento:', error);
+      Alert.alert('Erro', error.message || 'Erro desconhecido ao atualizar medicamento.');
     }
   };
 
