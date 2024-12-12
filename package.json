@@ -23,7 +23,7 @@
     "@react-navigation/stack": "^7.0.18",
     "axios": "^1.7.9",
     "concurrently": "^8.2.0",
-    "expo": "~51.0.24",
+    "expo": "^52.0.18",
     "expo-clipboard": "~6.0.3",
     "expo-constants": "~16.0.2",
     "expo-image": "~1.12.13",

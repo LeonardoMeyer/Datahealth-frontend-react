@@ -10,7 +10,7 @@ export default function UpdateMedication() {
   const { id } = useLocalSearchParams();
   const { medications, updateMedication } = useMedicationStore();
 
-  const medication = medications.find((item) => item.id === Number(id));
+  const medication = medications.find((item) => item.id === +id);
 
   const [txtMedicine, setTxtMedicine] = useState(medication?.medicine || '');
   const [txtDescription, setTxtDescription] = useState(medication?.description || '');

@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, TextInput, Alert } from 'react-native';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import Button from '../Views/components/Button';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -6,104 +6,97 @@ import { useRecordStore } from '../stores/useRecordStore';
 import { fetchAuth } from '../utils/fetchAuth';
 
 export default function UpdateRecord() {
+  const { records, updateRecord } = useRecordStore();
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const { records, updateRecord } = useRecordStore();
 
-  const record = records.find((item) => item.id === Number(id));
+  const record = records.find((item) => item.id === +id);
 
   const [txtReport, setTxtReport] = useState(record?.report || '');
   const [txtRecipe, setTxtRecipe] = useState(record?.recipe || '');
   const [txtDate, setTxtDate] = useState(record?.date || '');
-  const [txtImgUrl, setTxtImgUrl] = useState(record?.exam || ''); 
+  const [txtImgUrl, setTxtImgUrl] = useState(record?.exam || '');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!record) {
       Alert.alert('Erro', 'Registro não encontrado.');
-      router.push('/home'); 
+      router.push('/record');
     }
   }, [record]);
 
-  const handleDateInput = (value) => {
-    let cleanedValue = value.replace(/\D/g, ''); 
-
-    if (cleanedValue.length > 2 && cleanedValue.length <= 4) {
-      cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2)}`;
-    } else if (cleanedValue.length > 4) {
-      cleanedValue = `${cleanedValue.slice(0, 2)}/${cleanedValue.slice(2, 4)}/${cleanedValue.slice(4, 8)}`;
-    }
-
-    setTxtDate(cleanedValue); 
-  };
-
   const handleUpdateRecord = async () => {
-    if (!txtReport || !txtRecipe || !txtDate) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
-      return;
-    }
-
-    const dateParts = txtDate.split('/');
-    if (dateParts.length !== 3 || dateParts[0].length !== 2 || dateParts[1].length !== 2 || dateParts[2].length !== 4) {
-      Alert.alert('Erro', 'Data inválida! Use o formato dd/mm/yyyy.');
-      return;
-    }
-
-    const formattedDate = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`).toISOString();
+    const formattedDate = new Date(
+      txtDate.split('/').reverse().join('-')
+    ).toISOString();
 
     const updatedRecord = {
       report: txtReport,
       recipe: txtRecipe,
+      exam: txtImgUrl || null,
       date: formattedDate,
-      exam: txtImgUrl,
+      user_id: record?.user_id, 
+
     };
+
+    setLoading(true);
 
     try {
       const response = await fetchAuth(`http://localhost:3000/record/${id}`, {
         method: 'PUT',
-        body: JSON.stringify(updatedRecord),
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedRecord),
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const data = await response.json();
+        updateRecord(data.record); 
+        Alert.alert('Sucesso', 'Registro atualizado com sucesso!');
+        router.push('/record'); 
+      } else {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao atualizar o registro');
+        console.error('Erro ao atualizar o registro:', errorData);
+        Alert.alert('Erro', errorData.message || 'Erro ao atualizar o registro.');
       }
-
-      const data = await response.json();
-      updateRecord(data.record); 
-      Alert.alert('Sucesso', 'Registro atualizado com sucesso!');
-      router.back(); 
     } catch (error) {
-      Alert.alert('Erro', error.message); 
+      console.error('Erro ao atualizar registro:', error);
+      Alert.alert('Erro', error.message || 'Erro desconhecido ao atualizar o registro.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text>Relatório:</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.text}>Relatório:</Text>
       <TextInput
         style={styles.input}
         onChangeText={setTxtReport}
         value={txtReport}
         placeholder="Digite o relatório..."
+        placeholderTextColor="#DDDDDD"
       />
-      <Text>Receita:</Text>
+
+      <Text style={styles.text}>Receita:</Text>
       <TextInput
         style={styles.input}
         onChangeText={setTxtRecipe}
         value={txtRecipe}
         placeholder="Digite a receita..."
+        placeholderTextColor="#DDDDDD"
       />
-      <Text>Data:</Text>
+
+      <Text style={styles.text}>Data:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={handleDateInput}
+        onChangeText={setTxtDate}
         value={txtDate}
         placeholder="Digite a data (dd/mm/yyyy)..."
         keyboardType="numeric"
         maxLength={10}
       />
-      <Text>URL da Imagem:</Text>
+
+      <Text style={styles.text}>URL da Imagem:</Text>
       <TextInput
         style={styles.input}
         onChangeText={setTxtImgUrl}
@@ -111,14 +104,23 @@ export default function UpdateRecord() {
         placeholder="Digite a URL da imagem..."
         keyboardType="url"
       />
-      <Button onPress={handleUpdateRecord}>Atualizar</Button>
-    </View>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <View style={styles.buttonContainer}>
+          <Button onPress={handleUpdateRecord}>Atualizar</Button>
+        </View>
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    backgroundColor: '#f4f4f4',
+    flex: 1,
   },
   input: {
     borderWidth: 1,
@@ -127,5 +129,15 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginVertical: 5,
     borderRadius: 5,
+  },
+  text: {
+    fontWeight: '700',
+    marginBottom: 5,
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
   },
 });
