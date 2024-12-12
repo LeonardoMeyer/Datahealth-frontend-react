@@ -118,6 +118,8 @@ export default function Doctors() {
       <Text style={styles.doctorName}>{item.name}</Text>
       <Text style={styles.specialty}>Especialização: {item.specialization}</Text>
       <Text style={styles.specialty}>Gênero: {item.gender}</Text>
+      <Text style={styles.specialty}>Email: {item.email}</Text>
+
       <View style={styles.buttonGroup}>
         <Button onPress={() => handleEdit(item)} style={styles.updateButton}>
           Atualizar

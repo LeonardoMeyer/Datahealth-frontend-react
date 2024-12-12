@@ -47,6 +47,7 @@ export default function Records() {
   const renderRecord = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.doctorName}>{item.report}</Text>
+      <Text style={styles.doctorName}>{item.recipe}</Text>
       <Text style={styles.specialty}>{item.date}</Text>
       {item.exam && (
         <Image source={{ uri: item.exam }} style={styles.examImage} />
